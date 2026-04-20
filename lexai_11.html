@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LexAI — Legal AI for Founders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F8F5EF;
+    --ink: #1A1814;
+    --ink-60: rgba(26,24,20,0.6);
+    --ink-20: rgba(26,24,20,0.2);
+    --ink-08: rgba(26,24,20,0.08);
+    --gold: #B8974A;
+    --gold-light: #F0E8D4;
+    --green: #3B6D11;
+    --green-light: #EAF3DE;
+    --blue-light: #E6F1FB;
+    --blue-dark: #0C447C;
+    --coral-light: #FAECE7;
+    --coral-dark: #712B13;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --r: 10px;
+    --r-lg: 14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--ink-20); border-radius: 3px; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw;
+    height: 64px;
+    background: rgba(248,245,239,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--ink-08);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 1px 24px rgba(26,24,20,0.08); }
+
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logo-mark {
+    width: 32px; height: 32px;
+    border: 1px solid var(--ink-20);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav-logo-mark svg { width: 16px; height: 16px; stroke: var(--ink); fill: none; stroke-width: 1.5; }
+  .nav-logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 600; color: var(--ink);
+  }
+  .nav-logo-text em { font-style: italic; font-weight: 400; }
+
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    font-size: 13px; color: var(--ink-60);
+    text-decoration: none; letter-spacing: 0.2px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-ghost-nav {
+    font-family: 'Geist', sans-serif; font-size: 13px;
+    color: var(--ink); background: transparent;
+    border: 1px solid var(--ink-20); border-radius: 7px;
+    padding: 8px 16px; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-ghost-nav:hover { background: var(--ink-08); }
+  .btn-solid-nav {
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    color: var(--cream); background: var(--ink);
+    border: none; border-radius: 7px;
+    padding: 9px 18px; cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-solid-nav:hover { opacity: 0.82; }
+
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+  .nav-hamburger span { display: block; width: 22px; height: 1.5px; background: var(--ink); border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none; position: fixed; top: 64px; left: 0; right: 0;
+    background: var(--cream); border-bottom: 1px solid var(--ink-08);
+    padding: 1.5rem 5vw 2rem; z-index: 99;
+    flex-direction: column; gap: 1rem;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-size: 16px; color: var(--ink); text-decoration: none; padding: 0.5rem 0; border-bottom: 1px solid var(--ink-08); }
+  .mobile-menu .btn-solid-nav { width: 100%; text-align: center; margin-top: 0.5rem; padding: 12px; font-size: 15px; }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 100px 5vw; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--ink-60);
+    margin-bottom: 1.25rem;
+  }
+  .eyebrow-line { width: 24px; height: 1px; background: var(--ink-60); }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding-top: 64px;
+    background: var(--cream);
+    position: relative; overflow: hidden;
+  }
+  .hero-bg-line {
+    position: absolute; top: 0; left: 50%;
+    width: 1px; height: 100%;
+    background: var(--ink-08);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 5rem; align-items: center;
+    max-width: 1200px; margin: 0 auto;
+    width: 100%;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; color: var(--green);
+    background: var(--green-light);
+    border: 1px solid rgba(59,109,17,0.2);
+    border-radius: 20px; padding: 5px 13px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  .hero-h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(44px, 5.5vw, 68px);
+    font-weight: 500; line-height: 1.05;
+    letter-spacing: -0.5px;
+    margin-bottom: 1.5rem;
+  }
+  .hero-h1 em { font-style: italic; color: var(--ink-60); }
+
+  .hero-p {
+    font-size: 16px; color: var(--ink-60);
+    line-height: 1.75; max-width: 460px;
+    margin-bottom: 2.25rem; font-weight: 300;
+  }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500;
+    color: var(--cream); background: var(--ink);
+    border: none; border-radius: 8px;
+    padding: 13px 24px; cursor: pointer; transition: opacity 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { opacity: 0.82; }
+  .btn-outline {
+    font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 400;
+    color: var(--ink-60); background: transparent;
+    border: 1px solid var(--ink-20); border-radius: 8px;
+    padding: 12px 24px; cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { color: var(--ink); border-color: var(--ink-60); background: var(--ink-08); }
+
+  /* Chat mockup */
+  .chat-mockup {
+    border: 1px solid var(--ink-20); border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: 0 8px 48px rgba(26,24,20,0.10);
+    background: #fff;
+    animation: floatUp 0.8s ease 0.3s both;
+  }
+  @keyframes floatUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .chat-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--ink-08);
+    background: #FAFAF8;
+  }
+  .chat-bar-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  .chat-bar-label { font-size: 12px; color: var(--ink-60); flex: 1; }
+  .chat-bar-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 10px; background: var(--green-light); color: var(--green); }
+  .chat-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fff; }
+  .msg { max-width: 88%; }
+  .msg-ai { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+  .bubble {
+    padding: 10px 14px; font-size: 13px; line-height: 1.6;
+  }
+  .bubble-ai {
+    background: #F8F5EF; color: var(--ink);
+    border-radius: 3px 12px 12px 12px;
+    border: 1px solid var(--ink-08);
+  }
+  .bubble-user {
+    background: var(--ink); color: #fff;
+    border-radius: 12px 3px 12px 12px;
+  }
+  .doc-pill {
+    display: flex; align-items: center; gap: 9px;
+    border: 1px solid var(--ink-08); border-radius: 8px;
+    padding: 8px 11px; margin-top: 6px;
+    background: #fff; font-size: 11px; color: var(--ink-60);
+    cursor: pointer; transition: border-color 0.2s;
+  }
+  .doc-pill:hover { border-color: var(--ink-20); }
+  .doc-pill-icon {
+    width: 24px; height: 28px; border-radius: 4px;
+    background: var(--gold-light); border: 1px solid rgba(184,151,74,0.3);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .doc-pill-icon svg { width: 12px; height: 12px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+  .doc-pill-name { font-weight: 500; color: var(--ink); }
+  .chat-input-row {
+    display: flex; gap: 8px; align-items: center;
+    padding: 12px 16px; border-top: 1px solid var(--ink-08);
+    background: #FAFAF8;
+  }
+  .chat-fake-input {
+    flex: 1; font-size: 12px; color: var(--ink-60);
+    background: #fff; border: 1px solid var(--ink-08);
+    border-radius: 7px; padding: 8px 12px;
+  }
+  .chat-send-btn {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: var(--ink); border: none;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    flex-shrink: 0;
+  }
+  .chat-send-btn svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 2; }
+
+  /* ─── TRUST BAR ─── */
+  #trust { padding: 0 5vw 80px; }
+  .trust-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid var(--ink-08); border-radius: var(--r-lg);
+    padding: 2rem 2.5rem;
+    background: #fff;
+  }
+  .trust-item { text-align: center; }
+  .trust-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px; font-weight: 600; display: block;
+  }
+  .trust-label { font-size: 12px; color: var(--ink-60); margin-top: 2px; }
+  .trust-div { width: 1px; height: 40px; background: var(--ink-08); }
+
+  /* ─── HOW IT WORKS ─── */
+  #how { background: var(--ink); color: var(--cream); }
+  #how .eyebrow { color: rgba(248,245,239,0.5); }
+  #how .eyebrow-line { background: rgba(248,245,239,0.5); }
+  #how .section-title { color: var(--cream); }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 500; line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .section-title em { font-style: italic; }
+  .section-sub { font-size: 15px; color: var(--ink-60); max-width: 480px; line-height: 1.7; font-weight: 300; margin-bottom: 3rem; }
+  #how .section-sub { color: rgba(248,245,239,0.55); }
+
+  .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(248,245,239,0.1); border: 1px solid rgba(248,245,239,0.1); border-radius: var(--r-lg); overflow: hidden; margin-top: 3rem; }
+  .step-card { padding: 2rem; background: var(--ink); position: relative; }
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px; font-weight: 400;
+    color: rgba(248,245,239,0.12);
+    line-height: 1; margin-bottom: 1.25rem;
+  }
+  .step-icon {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(248,245,239,0.15);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .step-icon svg { width: 16px; height: 16px; stroke: rgba(248,245,239,0.7); fill: none; stroke-width: 1.5; }
+  .step-card h3 { font-size: 15px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+  .step-card p { font-size: 13px; color: rgba(248,245,239,0.55); line-height: 1.7; }
+
+  /* ─── FEATURES ─── */
+  #features { background: var(--cream); }
+  .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--ink-08); border: 1px solid var(--ink-08); border-radius: var(--r-lg); overflow: hidden; }
+  .feat-card { padding: 2rem; background: var(--cream); transition: background 0.25s; }
+  .feat-card:hover { background: #fff; }
+  .feat-tag {
+    display: inline-block; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 1rem;
+  }
+  .tag-edu { background: var(--purple-light); color: var(--purple-dark); }
+  .tag-store { background: var(--coral-light); color: var(--coral-dark); }
+  .tag-ai { background: var(--blue-light); color: var(--blue-dark); }
+  .tag-legal { background: var(--green-light); color: var(--green); }
+  .feat-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 500; margin-bottom: 8px; line-height: 1.2;
+  }
+  .feat-card p { font-size: 13px; color: var(--ink-60); line-height: 1.7; }
+
+  /* ─── DOCUMENTS ─── */
+  #documents { background: #fff; }
+  .docs-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+  .docs-left {}
+  .docs-list { display: flex; flex-direction: column; gap: 1px; border: 1px solid var(--ink-08); border-radius: var(--r-lg); overflow: hidden; margin-top: 1.5rem; }
+  .doc-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; background: #fff;
+    border-bottom: 1px solid var(--ink-08);
+    transition: background 0.2s; cursor: pointer;
+  }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-item:hover { background: var(--cream); }
+  .doc-file-icon {
+    width: 32px; height: 38px; flex-shrink: 0;
+    border: 1px solid var(--ink-08); border-radius: 5px;
+    background: var(--gold-light);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .doc-file-icon svg { width: 14px; height: 14px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+  .doc-item-info { flex: 1; }
+  .doc-item-name { font-size: 13px; font-weight: 500; }
+  .doc-item-desc { font-size: 11px; color: var(--ink-60); margin-top: 2px; }
+  .doc-item-badge {
+    font-size: 10px; font-weight: 500;
+    padding: 2px 8px; border-radius: 10px;
+    border: 1px solid var(--ink-08);
+    background: var(--cream); color: var(--ink-60);
+    white-space: nowrap;
+  }
+
+  .docs-right { position: sticky; top: 96px; }
+  .docs-promo {
+    border: 1px solid var(--ink-08); border-radius: var(--r-lg);
+    padding: 2rem; background: var(--cream);
+  }
+  .docs-promo-count {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px; font-weight: 600; line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .docs-promo-label { font-size: 14px; color: var(--ink-60); font-weight: 300; margin-bottom: 1.5rem; line-height: 1.6; }
+  .docs-categories { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.75rem; }
+  .cat-chip {
+    font-size: 11px; padding: 4px 10px; border-radius: 20px;
+    border: 1px solid var(--ink-08); background: #fff; color: var(--ink-60);
+  }
+
+  /* ─── ATTORNEY SECTION ─── */
+  #attorney { background: var(--cream); }
+  .attorney-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .atty-card {
+    border: 1px solid rgba(184,151,74,0.3);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: #fff;
+  }
+  .atty-card-header {
+    background: var(--gold-light);
+    border-bottom: 1px solid rgba(184,151,74,0.2);
+    padding: 1.5rem;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .atty-avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(184,151,74,0.2);
+    border: 1px solid rgba(184,151,74,0.35);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .atty-avatar svg { width: 22px; height: 22px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+  .atty-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--ink); }
+  .atty-title { font-size: 12px; color: var(--gold); font-weight: 500; margin-top: 2px; }
+  .atty-card-body { padding: 1.5rem; }
+  .atty-stamp {
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid rgba(184,151,74,0.25); border-radius: var(--r);
+    padding: 10px 14px; margin-bottom: 1.25rem;
+    background: #FFFDF8;
+  }
+  .atty-stamp-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--gold-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .atty-stamp-icon svg { width: 14px; height: 14px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+  .atty-stamp-text { font-size: 12px; color: var(--ink); }
+  .atty-stamp-text span { color: var(--ink-60); }
+  .atty-checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .atty-checklist li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--ink-60); line-height: 1.6; }
+  .atty-check { width: 18px; height: 18px; border-radius: 50%; background: var(--green-light); border: 1px solid rgba(59,109,17,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .atty-check svg { width: 10px; height: 10px; stroke: var(--green); fill: none; stroke-width: 2.5; }
+  .atty-card-footer {
+    border-top: 1px solid var(--ink-08);
+    padding: 1rem 1.5rem;
+    font-size: 11px; color: var(--ink-60);
+    background: #FAFAF8;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .atty-card-footer svg { width: 13px; height: 13px; stroke: var(--ink-60); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+  .atty-right {}
+  .atty-right .section-title { margin-bottom: 1rem; }
+  .atty-right .section-sub { margin-bottom: 2rem; }
+  .atty-pills { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
+  .atty-pill {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--ink-08); border-radius: var(--r);
+    background: #fff; transition: border-color 0.2s;
+  }
+  .atty-pill:hover { border-color: var(--ink-20); }
+  .atty-pill-icon { width: 32px; height: 32px; border-radius: 7px; background: var(--gold-light); border: 1px solid rgba(184,151,74,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .atty-pill-icon svg { width: 15px; height: 15px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+  .atty-pill-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+  .atty-pill-desc { font-size: 12px; color: var(--ink-60); line-height: 1.6; }
+
+  /* ─── ATTORNEY BADGE on docs ─── */
+  .atty-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.3px;
+    color: var(--gold); background: var(--gold-light);
+    border: 1px solid rgba(184,151,74,0.3);
+    border-radius: 10px; padding: 2px 7px;
+    white-space: nowrap;
+  }
+  .atty-badge svg { width: 9px; height: 9px; stroke: var(--gold); fill: none; stroke-width: 2; }
+
+  /* ─── PRICING ─── */
+  #pricing { background: var(--cream); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 3rem; }
+  .plan {
+    border: 1px solid var(--ink-08); border-radius: var(--r-lg);
+    padding: 1.75rem; background: #fff; display: flex; flex-direction: column;
+  }
+  .plan.featured { border: 2px solid var(--ink); background: var(--ink); color: var(--cream); }
+  .plan-tier { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .plan-price { font-family: 'Cormorant Garamond', serif; font-size: 40px; font-weight: 500; line-height: 1; }
+  .plan-period { font-size: 12px; color: var(--ink-60); margin-top: 3px; margin-bottom: 1.5rem; }
+  .plan.featured .plan-period { color: rgba(248,245,239,0.5); }
+  .plan-divider { height: 1px; background: var(--ink-08); margin-bottom: 1.25rem; }
+  .plan.featured .plan-divider { background: rgba(248,245,239,0.12); }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .plan-features li {
+    font-size: 13px; color: var(--ink-60);
+    display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+  }
+  .plan.featured .plan-features li { color: rgba(248,245,239,0.65); }
+  .plan-check { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; stroke: var(--ink); fill: none; stroke-width: 2; }
+  .plan.featured .plan-check { stroke: var(--cream); }
+  .plan-cta {
+    margin-top: 1.75rem; width: 100%;
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    padding: 11px; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+    border: 1px solid var(--ink-08); background: transparent; color: var(--ink);
+  }
+  .plan-cta:hover { background: var(--cream); }
+  .plan.featured .plan-cta {
+    background: var(--cream); color: var(--ink); border: none;
+  }
+  .plan.featured .plan-cta:hover { opacity: 0.9; }
+
+  /* ─── TESTIMONIALS ─── */
+  #testimonials { background: #fff; }
+  .testi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 3rem; }
+  .testi-card { border: 1px solid var(--ink-08); border-radius: var(--r-lg); padding: 1.75rem; background: var(--cream); }
+  .testi-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-style: italic; font-weight: 400;
+    line-height: 1.55; color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .av1 { background: var(--purple-light); color: var(--purple-dark); }
+  .av2 { background: var(--green-light); color: var(--green); }
+  .av3 { background: var(--coral-light); color: var(--coral-dark); }
+  .av4 { background: var(--blue-light); color: var(--blue-dark); }
+  .author-name { font-size: 13px; font-weight: 500; }
+  .author-role { font-size: 12px; color: var(--ink-60); }
+
+  /* ─── FAQ ─── */
+  #faq { background: var(--cream); }
+  .faq-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--ink-08); border-radius: var(--r-lg); overflow: hidden; margin-top: 2.5rem; max-width: 720px; }
+  .faq-item { border-bottom: 1px solid var(--ink-08); background: #fff; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    width: 100%; text-align: left; padding: 1.25rem 1.5rem;
+    font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500;
+    color: var(--ink); background: transparent; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  }
+  .faq-q:hover { background: var(--cream); }
+  .faq-chevron { flex-shrink: 0; transition: transform 0.25s; }
+  .faq-chevron svg { width: 16px; height: 16px; stroke: var(--ink-60); fill: none; stroke-width: 1.5; }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+  .faq-a {
+    display: none; padding: 0 1.5rem 1.25rem;
+    font-size: 13px; color: var(--ink-60); line-height: 1.75;
+  }
+  .faq-item.open .faq-a { display: block; }
+  .faq-disclaimer {
+    margin-top: 1.5rem; max-width: 720px;
+    padding: 1rem 1.25rem;
+    background: var(--gold-light); border: 1px solid rgba(184,151,74,0.3);
+    border-radius: var(--r); font-size: 12px; color: var(--ink-60); line-height: 1.65;
+  }
+  .faq-disclaimer strong { color: var(--ink); }
+
+  /* ─── CTA BANNER ─── */
+  #cta { background: var(--ink); color: var(--cream); text-align: center; }
+  #cta .section-title { color: var(--cream); }
+  #cta .section-sub { color: rgba(248,245,239,0.5); margin: 0 auto 2.5rem; }
+  .cta-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .btn-cream {
+    font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500;
+    color: var(--ink); background: var(--cream);
+    border: none; border-radius: 8px;
+    padding: 13px 24px; cursor: pointer; transition: opacity 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-cream:hover { opacity: 0.88; }
+  .btn-outline-cream {
+    font-family: 'Geist', sans-serif; font-size: 14px;
+    color: rgba(248,245,239,0.65); background: transparent;
+    border: 1px solid rgba(248,245,239,0.2); border-radius: 8px;
+    padding: 12px 24px; cursor: pointer; transition: all 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-outline-cream:hover { color: var(--cream); border-color: rgba(248,245,239,0.5); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--ink); color: rgba(248,245,239,0.45);
+    border-top: 1px solid rgba(248,245,239,0.08);
+    padding: 2.5rem 5vw;
+  }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 2rem;
+  }
+  .footer-brand {}
+  .footer-logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 600; color: var(--cream);
+    display: block; margin-bottom: 0.75rem;
+  }
+  .footer-logo-text em { font-style: italic; font-weight: 400; }
+  .footer-tagline { font-size: 12px; line-height: 1.6; }
+  .footer-col-title { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: rgba(248,245,239,0.3); margin-bottom: 1rem; }
+  .footer-col a { display: block; font-size: 13px; color: rgba(248,245,239,0.45); text-decoration: none; padding: 3px 0; transition: color 0.2s; }
+  .footer-col a:hover { color: var(--cream); }
+  .footer-bottom {
+    max-width: 1200px; margin: 2rem auto 0;
+    padding-top: 1.5rem; border-top: 1px solid rgba(248,245,239,0.08);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px;
+  }
+  .footer-disclaimer { font-size: 11px; color: rgba(248,245,239,0.25); max-width: 600px; line-height: 1.6; }
+
+  /* ─── ANIMATIONS ─── */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: none; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .docs-layout { grid-template-columns: 1fr; }
+    .docs-right { position: static; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+    .testi-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .trust-inner { flex-wrap: wrap; gap: 1.5rem; justify-content: center; }
+    .trust-div { display: none; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    .nav-actions .btn-ghost-nav { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    section { padding: 70px 5vw; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 16 16"><path d="M8 2 L8 14 M4 5 L8 2 L12 5"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="4" y1="11" x2="12" y2="11"/></svg>
+    </div>
+    <span class="nav-logo-text">Lex<em>AI</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#attorney">Attorney oversight</a>
+    <a href="https://www.businessdocs.ca" target="_blank" rel="noopener">Documents</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-ghost-nav" onclick="openAuth('signin')">Sign in</button>
+    <button class="btn-solid-nav" onclick="window.location.href='lexai-chat.html'">Get started free</button>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#how">How it works</a>
+  <a href="#features">Features</a>
+  <a href="#attorney">Attorney oversight</a>
+  <a href="https://www.businessdocs.ca" target="_blank" rel="noopener">Documents</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#faq">FAQ</a>
+  <button class="btn-solid-nav" style="text-align:center;" onclick="window.location.href='lexai-chat.html'">Get started free</button>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-line"></div>
+  <div class="hero-grid container">
+    <div class="hero-left">
+      <div class="hero-tag"><span class="hero-tag-dot"></span> Every document attorney-reviewed &amp; signed</div>
+      <h1 class="hero-h1">Build your corporation<br>the <em>right</em> way,<br>from day one.</h1>
+      <p class="hero-p">LexAI is your AI-powered legal guide — teaching you every step of the incorporation process, backed by a licensed in-house attorney who reviews and signs every document that requires legal oversight.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="window.location.href='lexai-chat.html'">Start incorporating free</button>
+        <a href="https://www.businessdocs.ca" target="_blank" rel="noopener" class="btn-outline">Browse document store</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="chat-mockup">
+        <div class="chat-bar">
+          <span class="chat-bar-dot"></span>
+          <span class="chat-bar-label">LexAI Assistant</span>
+          <span class="chat-bar-badge">Online</span>
+        </div>
+        <div class="chat-body">
+          <div class="msg msg-user">
+            <div class="bubble bubble-user">What's the difference between an LLC and a C-Corp?</div>
+          </div>
+          <div class="msg msg-ai">
+            <div class="bubble bubble-ai">Great question. A C-Corp is taxed separately from its owners and is preferred for venture-backed startups due to equity flexibility. An LLC offers pass-through taxation and less overhead — better for solo founders or small teams.</div>
+            <div class="doc-pill">
+              <div class="doc-pill-icon"><svg viewBox="0 0 12 12"><path d="M2 1h6l2 2v8H2z"/><path d="M7 1v3h3"/></svg></div>
+              <div><div class="doc-pill-name">C-Corp Formation Template</div><div style="font-size:10px;margin-top:1px;color:var(--ink-60)">Suggested from your document store</div></div>
+            </div>
+            <div class="doc-pill">
+              <div class="doc-pill-icon"><svg viewBox="0 0 12 12"><path d="M2 1h6l2 2v8H2z"/><path d="M7 1v3h3"/></svg></div>
+              <div><div class="doc-pill-name">LLC Operating Agreement</div><div style="font-size:10px;margin-top:1px;color:var(--ink-60)">Suggested from your document store</div></div>
+            </div>
+          </div>
+          <div class="msg msg-user">
+            <div class="bubble bubble-user">What state should I incorporate in?</div>
+          </div>
+          <div class="msg msg-ai">
+            <div class="bubble bubble-ai">Delaware is the gold standard for C-Corps planning to raise VC funding. Nevada and Wyoming are popular for LLCs seeking strong privacy protections. For most solo founders, your home state is perfectly fine.</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <div class="chat-fake-input">Ask about bylaws, equity, EIN, filings...</div>
+          <button class="chat-send-btn"><svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><polyline points="5,2 10,2 10,7"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div id="trust">
+  <div class="trust-inner fade-in">
+    <div class="trust-item"><span class="trust-num">2,400+</span><span class="trust-label">Companies incorporated</span></div>
+    <div class="trust-div"></div>
+    <div class="trust-item"><span class="trust-num">180+</span><span class="trust-label">Attorney-reviewed documents</span></div>
+    <div class="trust-div"></div>
+    <div class="trust-item" style="display:flex;align-items:center;gap:10px;text-align:left;">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--gold-light);border:1px solid rgba(184,151,74,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--gold)" stroke-width="1.5"><circle cx="9" cy="6" r="3"/><path d="M3 15c0-3.314 2.686-6 6-6s6 2.686 6 6"/><polyline points="7,13 9,15 12,11" stroke-width="1.5"/></svg>
+      </div>
+      <div><span class="trust-num" style="font-size:22px;display:block;">In-house attorney</span><span class="trust-label">Reviews &amp; signs all legal documents</span></div>
+    </div>
+    <div class="trust-div"></div>
+    <div class="trust-item"><span class="trust-num">50 states</span><span class="trust-label">Formation coverage</span></div>
+    <div class="trust-div"></div>
+    <div class="trust-item"><span class="trust-num">4.9 / 5</span><span class="trust-label">Average customer rating</span></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="container">
+    <div class="eyebrow"><span class="eyebrow-line"></span> How it works</div>
+    <h2 class="section-title">From first question to<br><em>signed &amp; filed.</em></h2>
+    <div class="steps-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="step-card fade-in">
+        <div class="step-num">01</div>
+        <div class="step-icon"><svg viewBox="0 0 16 16"><path d="M2 12 Q2 14 4 14 L12 14 Q14 14 14 12 L14 6 Q14 4 12 4 L8 4 L6 2 L4 2 Q2 2 2 4 Z"/></svg></div>
+        <h3>Ask LexAI anything</h3>
+        <p>Start a conversation about your business goals. LexAI explains legal concepts, entity types, and filing requirements in plain English.</p>
+      </div>
+      <div class="step-card fade-in" style="transition-delay:0.1s">
+        <div class="step-num">02</div>
+        <div class="step-icon"><svg viewBox="0 0 16 16"><path d="M2 2h8l3 3v9H2z"/><path d="M9 2v4h5"/><line x1="4" y1="8" x2="11" y2="8"/><line x1="4" y1="11" x2="11" y2="11"/></svg></div>
+        <h3>Get matched to documents</h3>
+        <p>Based on your conversation, LexAI surfaces the exact attorney-drafted templates you need — ready to download, customize, and review.</p>
+      </div>
+      <div class="step-card fade-in" style="transition-delay:0.2s;border:1px solid rgba(184,151,74,0.35);background:rgba(184,151,74,0.07);">
+        <div class="step-num" style="color:rgba(184,151,74,0.4)">03</div>
+        <div class="step-icon" style="border-color:rgba(184,151,74,0.3)"><svg viewBox="0 0 16 16" stroke="rgba(184,151,74,0.9)" fill="none" stroke-width="1.5"><circle cx="8" cy="5" r="2.5"/><path d="M3 13c0-2.76 2.24-5 5-5s5 2.24 5 5"/><polyline points="6,11 8,13 11,9"/></svg></div>
+        <h3 style="color:rgba(248,245,239,0.92)">Attorney review &amp; sign-off</h3>
+        <p style="color:rgba(248,245,239,0.5)">Our in-house licensed attorney reviews every document requiring legal oversight and provides a formal sign-off before delivery.</p>
+        <div style="margin-top:0.85rem;display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:500;color:rgba(184,151,74,0.95);background:rgba(184,151,74,0.12);border:1px solid rgba(184,151,74,0.28);border-radius:20px;padding:4px 11px;">
+          <span style="width:5px;height:5px;border-radius:50%;background:rgba(184,151,74,0.95);flex-shrink:0;"></span> Licensed attorney on staff
+        </div>
+      </div>
+      <div class="step-card fade-in" style="transition-delay:0.3s">
+        <div class="step-num">04</div>
+        <div class="step-icon"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><polyline points="5,8 7,10 11,6"/></svg></div>
+        <h3>File with confidence</h3>
+        <p>Follow LexAI's guided state-specific checklists to file your formation documents, set up your EIN, and structure your equity correctly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="eyebrow"><span class="eyebrow-line"></span> Features</div>
+    <h2 class="section-title">Everything you need to<br><em>build it right.</em></h2>
+    <div class="features-grid" style="margin-top:2.5rem">
+      <div class="feat-card fade-in">
+        <div class="feat-tag tag-edu">Education</div>
+        <h3>Guided incorporation curriculum</h3>
+        <p>From entity selection to EIN filing to cap table setup — LexAI walks you through each milestone with structured lessons tailored to your state and entity type. Learn as you build.</p>
+      </div>
+      <div class="feat-card fade-in" style="transition-delay:0.1s">
+        <div class="feat-tag tag-store">Document store</div>
+        <h3>180+ attorney-reviewed templates</h3>
+        <p>Bylaws, operating agreements, founder vesting schedules, NDAs, IP assignments — every document your corporation needs, reviewed and approved by our in-house licensed attorney.</p>
+      </div>
+      <div class="feat-card fade-in" style="transition-delay:0.15s;background:#FFFDF8;border-top:2px solid var(--gold);">
+        <div class="feat-tag" style="background:var(--gold-light);color:var(--gold);">Attorney oversight</div>
+        <h3>In-house attorney review &amp; sign-off</h3>
+        <p>Every document requiring legal oversight is personally reviewed and signed by our in-house licensed attorney before it reaches you — giving you real legal backing, not just templates. This is what separates LexAI from every other tool.</p>
+      </div>
+      <div class="feat-card fade-in" style="transition-delay:0.2s">
+        <div class="feat-tag tag-ai">AI pipeline</div>
+        <h3>Answers grounded in your documents</h3>
+        <p>LexAI cites the relevant documents in its answers and surfaces the exact template you need mid-conversation — your document store becomes a living, attorney-backed knowledge base.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ATTORNEY OVERSIGHT -->
+<section id="attorney">
+  <div class="container">
+    <div class="attorney-layout">
+      <div class="atty-card fade-in">
+        <div class="atty-card-header">
+          <div class="atty-avatar">
+            <svg viewBox="0 0 22 22"><circle cx="11" cy="7" r="4"/><path d="M3 19c0-4.418 3.582-8 8-8s8 3.582 8 8"/><polyline points="8,16 11,19 15,13"/></svg>
+          </div>
+          <div>
+            <div class="atty-name">In-House Counsel</div>
+            <div class="atty-title">Licensed Attorney · On Staff</div>
+          </div>
+        </div>
+        <div class="atty-card-body">
+          <div class="atty-stamp">
+            <div class="atty-stamp-icon"><svg viewBox="0 0 14 14"><path d="M2 12l3-3 2 2 5-7"/><circle cx="7" cy="7" r="6"/></svg></div>
+            <div class="atty-stamp-text">Attorney review &amp; sign-off included <span>on all documents requiring legal oversight</span></div>
+          </div>
+          <ul class="atty-checklist">
+            <li>
+              <div class="atty-check"><svg viewBox="0 0 10 10"><polyline points="2,5 4,7 8,3"/></svg></div>
+              Reviews every formation document for accuracy, completeness, and jurisdictional compliance before delivery
+            </li>
+            <li>
+              <div class="atty-check"><svg viewBox="0 0 10 10"><polyline points="2,5 4,7 8,3"/></svg></div>
+              Signs documents that require a licensed attorney signatory — so you're covered, not just educated
+            </li>
+            <li>
+              <div class="atty-check"><svg viewBox="0 0 10 10"><polyline points="2,5 4,7 8,3"/></svg></div>
+              Periodically re-reviews all templates in the store to reflect current state law and regulatory changes
+            </li>
+            <li>
+              <div class="atty-check"><svg viewBox="0 0 10 10"><polyline points="2,5 4,7 8,3"/></svg></div>
+              Flags jurisdiction-specific nuances inside LexAI's answers when your situation requires special attention
+            </li>
+          </ul>
+        </div>
+        <div class="atty-card-footer">
+          <svg viewBox="0 0 13 13"><path d="M6.5 1a5.5 5.5 0 100 11A5.5 5.5 0 006.5 1z"/><line x1="6.5" y1="6" x2="6.5" y2="9.5"/><circle cx="6.5" cy="4" r="0.5" fill="currentColor"/></svg>
+          Attorney sign-off is shown on each document in the store. Documents are labeled with the review date and jurisdiction scope.
+        </div>
+      </div>
+
+      <div class="atty-right fade-in" style="transition-delay:0.15s">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Attorney oversight</div>
+        <h2 class="section-title">Not just AI.<br><em>Attorney-backed.</em></h2>
+        <p class="section-sub">Every other legal AI tool gives you templates and wishes you luck. LexAI is the only platform where a licensed in-house attorney reads and signs the documents that matter.</p>
+        <div class="atty-pills">
+          <div class="atty-pill">
+            <div class="atty-pill-icon"><svg viewBox="0 0 15 15"><path d="M2 13l3.5-3.5 2.5 2.5 6-8"/></svg></div>
+            <div>
+              <div class="atty-pill-title">Document sign-off</div>
+              <div class="atty-pill-desc">Formation filings, operating agreements, bylaws, equity agreements — any document with legal weight gets attorney review and a formal signature before it reaches you.</div>
+            </div>
+          </div>
+          <div class="atty-pill">
+            <div class="atty-pill-icon"><svg viewBox="0 0 15 15"><rect x="2" y="2" width="11" height="11" rx="2"/><line x1="5" y1="7.5" x2="10" y2="7.5"/><line x1="7.5" y1="5" x2="7.5" y2="10"/></svg></div>
+            <div>
+              <div class="atty-pill-title">Template maintenance</div>
+              <div class="atty-pill-desc">State laws change. Our attorney actively maintains the document store so every template stays current — you're never filing on outdated language.</div>
+            </div>
+          </div>
+          <div class="atty-pill">
+            <div class="atty-pill-icon"><svg viewBox="0 0 15 15"><circle cx="7.5" cy="7.5" r="5.5"/><line x1="7.5" y1="5" x2="7.5" y2="8"/><circle cx="7.5" cy="10" r="0.6" fill="currentColor" stroke="none"/></svg></div>
+            <div>
+              <div class="atty-pill-title">Edge case escalation</div>
+              <div class="atty-pill-desc">When LexAI identifies a situation that needs human legal judgment — unusual structures, multi-state complexity, red flags — it routes you to attorney review automatically.</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="window.location.href='lexai-chat.html'">Start incorporating free</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCUMENTS -->
+<section id="documents">
+  <div class="container">
+    <div class="docs-layout">
+      <div class="docs-left">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Document store</div>
+        <h2 class="section-title">Every document<br><em>your corporation needs.</em></h2>
+        <p class="section-sub">All templates are drafted and reviewed by licensed attorneys. LexAI matches you to the right document for your situation automatically.</p>
+        <div class="docs-list fade-in">
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">Articles of Incorporation</div><div class="doc-item-desc">Delaware C-Corp, all standard provisions</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">C-Corp</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">LLC Operating Agreement</div><div class="doc-item-desc">Single-member & multi-member versions</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">LLC</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">Founder Vesting Agreement</div><div class="doc-item-desc">4-year schedule, 1-year cliff</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">Equity</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">IP Assignment Agreement</div><div class="doc-item-desc">Transfer pre-incorporation IP to entity</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">IP</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">Corporate Bylaws</div><div class="doc-item-desc">Board structure, voting rights, officer roles</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">C-Corp</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">Mutual NDA</div><div class="doc-item-desc">Standard bilateral non-disclosure agreement</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">General</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">Board Consent Resolution</div><div class="doc-item-desc">Initial organizational consent in lieu of meeting</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">C-Corp</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">83(b) Election Letter</div><div class="doc-item-desc">IRS filing for unvested founder shares</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">Tax</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="docs-right fade-in">
+        <div class="docs-promo">
+          <div class="docs-promo-count">180+</div>
+          <div class="docs-promo-label">Attorney-drafted templates across every stage of your company's life — formation, fundraising, employment, and beyond.</div>
+          <div class="docs-categories">
+            <span class="cat-chip">Formation</span>
+            <span class="cat-chip">Equity & Vesting</span>
+            <span class="cat-chip">Employment</span>
+            <span class="cat-chip">IP & Confidentiality</span>
+            <span class="cat-chip">Fundraising</span>
+            <span class="cat-chip">Board & Governance</span>
+            <span class="cat-chip">Tax Elections</span>
+            <span class="cat-chip">Compliance</span>
+          </div>
+          <a href="https://www.businessdocs.ca" target="_blank" rel="noopener" class="btn-primary" style="width:100%;text-align:center;display:block;font-size:13px;">Browse the full store</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="eyebrow"><span class="eyebrow-line"></span> Pricing</div>
+    <h2 class="section-title">Straightforward pricing.<br><em>No surprise attorney fees.</em></h2>
+    <div class="pricing-grid">
+      <div class="plan fade-in">
+        <div class="plan-tier">Starter</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-period">Free forever</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> LexAI chat (50 messages/mo)</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> 5 document downloads</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Incorporation basics guide</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> State filing lookup</li>
+        </ul>
+        <button class="plan-cta" onclick="window.location.href='lexai-chat.html'">Get started free</button>
+      </div>
+      <div class="plan featured fade-in" style="transition-delay:0.1s">
+        <div class="plan-tier">Founder</div>
+        <div class="plan-price">$49</div>
+        <div class="plan-period">per month, billed monthly</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Unlimited LexAI conversations</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Full document store access</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Document customization tools</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> State filing checklists</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Compliance reminders</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Priority email support</li>
+          <li style="margin-top:4px;padding-top:10px;border-top:1px solid rgba(248,245,239,0.12);">
+            <svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg>
+            <span><strong style="color:var(--cream)">In-house attorney review</strong> &amp; sign-off on all documents</span>
+          </li>
+        </ul>
+        <button class="plan-cta" onclick="window.location.href='lexai-chat.html'">Start 14-day free trial</button>
+      </div>
+      <div class="plan fade-in" style="transition-delay:0.2s">
+        <div class="plan-tier">Law Firm</div>
+        <div class="plan-price">Custom</div>
+        <div class="plan-period">White-label available</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Custom branded AI assistant</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Your own document store</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Client-facing portal</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> API access & integrations</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Dedicated account manager</li>
+        </ul>
+        <button class="plan-cta">Talk to us</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="container">
+    <div class="eyebrow"><span class="eyebrow-line"></span> What people say</div>
+    <h2 class="section-title">Founders who built<br><em>with confidence.</em></h2>
+    <div class="testi-grid">
+      <div class="testi-card fade-in">
+        <div class="testi-quote">"LexAI cut our legal costs in half during incorporation. It's the first tool that actually explained what I was signing, not just handed me a PDF."</div>
+        <div class="testi-author"><div class="avatar av1">SR</div><div><div class="author-name">Sofia R.</div><div class="author-role">Co-founder, Vesper Labs</div></div></div>
+      </div>
+      <div class="testi-card fade-in" style="transition-delay:0.1s">
+        <div class="testi-quote">"The document store alone saved us $4,000 in attorney fees. And LexAI walked us through our 83(b) election before we even knew we needed one."</div>
+        <div class="testi-author"><div class="avatar av2">JL</div><div><div class="author-name">James L.</div><div class="author-role">Founder & CEO, Frond</div></div></div>
+      </div>
+      <div class="testi-card fade-in" style="transition-delay:0.15s">
+        <div class="testi-quote">"As a non-technical founder, legal stuff terrified me. LexAI made it feel manageable. I incorporated my Delaware C-Corp in a weekend."</div>
+        <div class="testi-author"><div class="avatar av3">MK</div><div><div class="author-name">Maya K.</div><div class="author-role">Founder, Orbit Studio</div></div></div>
+      </div>
+      <div class="testi-card fade-in" style="transition-delay:0.2s">
+        <div class="testi-quote">"I asked LexAI a question mid-conversation and it immediately pulled up the exact operating agreement template I needed. That pipeline is genuinely magic."</div>
+        <div class="testi-author"><div class="avatar av4">TN</div><div><div class="author-name">Tom N.</div><div class="author-role">Founder, Glint</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="eyebrow"><span class="eyebrow-line"></span> FAQ</div>
+    <h2 class="section-title">Common questions.</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q">Does LexAI have a real attorney involved? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
+        <div class="faq-a">Yes — this is what makes LexAI fundamentally different. We have a licensed attorney on staff who personally reviews and signs every document that requires legal oversight before it is delivered to you. You're not just getting AI-generated templates; you're getting attorney-reviewed, signed legal documents backed by real professional accountability.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What exactly does the in-house attorney review? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
+        <div class="faq-a">Our in-house attorney reviews all documents that carry legal weight — formation documents, operating agreements, bylaws, equity agreements, IP assignments, and any document requiring a licensed signatory. They review for legal accuracy, jurisdictional compliance, and completeness before sign-off. LexAI flags which documents in the store carry attorney sign-off, so you always know what's been reviewed.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Who drafts the documents in the store? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
+        <div class="faq-a">All templates in the LexAI document store are drafted and periodically reviewed by licensed attorneys with experience in corporate law. Each document notes the jurisdiction(s) it applies to and when it was last reviewed and signed by our in-house attorney.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What entity types does LexAI cover? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
+        <div class="faq-a">LexAI covers C-Corporations, S-Corporations, LLCs (single-member and multi-member), and general partnerships. The AI assistant can help you understand the trade-offs between entity types and guide you toward the right fit for your situation.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can I use LexAI for my law firm or legal practice? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
+        <div class="faq-a">Yes. The Law Firm plan offers a white-label version of LexAI that you can deploy under your own brand, populated with your own document store and your own attorney oversight workflow. Contact us to learn more.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Does LexAI cover all 50 states? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
+        <div class="faq-a">Yes. LexAI has state-specific formation guides, filing fee information, and compliance checklists for all 50 states. Document templates note the jurisdiction(s) they apply to, and our in-house attorney reviews jurisdiction-specific nuances during sign-off.</div>
+      </div>
+    </div>
+    <div class="faq-disclaimer">
+      <strong>A note on legal services:</strong> LexAI combines AI-powered legal education with a licensed in-house attorney who reviews and signs documents requiring legal oversight. While this provides meaningful legal backing, use of LexAI does not establish a traditional attorney-client relationship for ongoing representation. For litigation, complex disputes, or matters outside business formation and corporate documentation, we recommend engaging outside counsel. Our attorney sign-off applies to documents sourced through the LexAI platform.
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="container" style="text-align:center">
+    <h2 class="section-title">Your corporation starts<br>with a <em>conversation.</em></h2>
+    <p class="section-sub">Ask LexAI your first question — AI-guided, attorney-backed, no surprise fees.</p>
+    <div class="cta-btns">
+      <button class="btn-cream" onclick="window.location.href='lexai-chat.html'">Start incorporating for free</button>
+      <a href="https://www.businessdocs.ca" target="_blank" rel="noopener" class="btn-outline-cream">See the document store</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-logo-text">Lex<em>AI</em></span>
+      <p class="footer-tagline">AI-powered legal education and document pipeline — backed by a licensed in-house attorney who reviews and signs every document that matters.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Product</div>
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="https://www.businessdocs.ca" target="_blank" rel="noopener">Document store</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Company</div>
+      <a href="#">About</a>
+      <a href="#">Blog</a>
+      <a href="#">Careers</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Legal</div>
+      <a href="#">Privacy policy</a>
+      <a href="#">Terms of service</a>
+      <a href="#">Legal disclaimer</a>
+      <a href="#">Cookie policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 LexAI, Inc. All rights reserved.</span>
+    <span class="footer-disclaimer">LexAI combines AI-powered legal education with in-house licensed attorney review and sign-off on documents requiring legal oversight. Use of this platform does not establish an attorney-client relationship for ongoing representation.</span>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // Mobile menu
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+<!-- ══════════════════════════════════════════
+     AUTH MODAL
+══════════════════════════════════════════ -->
+<style>
+  .auth-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(26,24,20,0.55);
+    backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+    padding: 1rem;
+    animation: authFadeIn 0.2s ease;
+  }
+  .auth-overlay.open { display: flex; }
+  @keyframes authFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .auth-modal {
+    width: 100%; max-width: 420px;
+    background: #F8F5EF;
+    border: 1px solid rgba(26,24,20,0.1);
+    border-radius: 14px;
+    padding: 2rem 1.75rem 1.75rem;
+    position: relative;
+    font-family: 'Geist', sans-serif;
+    box-shadow: 0 20px 60px rgba(26,24,20,0.25);
+    animation: authSlideUp 0.25s ease;
+  }
+  @keyframes authSlideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  .auth-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 28px; height: 28px; border-radius: 6px;
+    border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(26,24,20,0.4); transition: all 0.15s;
+  }
+  .auth-close:hover { background: rgba(26,24,20,0.08); color: #1A1814; }
+
+  .auth-logo {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+  .auth-logomark {
+    width: 30px; height: 30px; border: 1px solid rgba(26,24,20,0.2);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  }
+  .auth-logomark svg { width: 15px; height: 15px; stroke: #1A1814; fill: none; stroke-width: 1.5; }
+  .auth-logotext { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: #1A1814; }
+  .auth-logotext em { font-style: italic; font-weight: 400; }
+
+  .auth-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 500;
+    color: #1A1814; margin-bottom: 4px;
+  }
+  .auth-title em { font-style: italic; }
+  .auth-sub {
+    font-size: 13px; color: rgba(26,24,20,0.6);
+    margin-bottom: 1.5rem; font-weight: 300;
+  }
+
+  .auth-google {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    gap: 10px; padding: 11px; margin-bottom: 1rem;
+    background: #fff; border: 1px solid rgba(26,24,20,0.2);
+    border-radius: 8px; cursor: pointer;
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    color: #1A1814; transition: all 0.15s;
+  }
+  .auth-google:hover { background: rgba(26,24,20,0.04); border-color: rgba(26,24,20,0.4); }
+  .auth-google img, .auth-google svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .auth-divider {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; color: rgba(26,24,20,0.3);
+    letter-spacing: 0.5px; text-transform: uppercase;
+    margin: 1.25rem 0;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ''; flex: 1; height: 1px; background: rgba(26,24,20,0.1);
+  }
+
+  .auth-field { margin-bottom: 0.85rem; }
+  .auth-label {
+    display: block; font-size: 11px; font-weight: 500;
+    color: rgba(26,24,20,0.7); margin-bottom: 5px;
+    letter-spacing: 0.3px;
+  }
+  .auth-input {
+    width: 100%; padding: 10px 12px;
+    background: #fff;
+    border: 1px solid rgba(26,24,20,0.15);
+    border-radius: 7px;
+    font-family: 'Geist', sans-serif; font-size: 14px;
+    color: #1A1814; outline: none;
+    transition: border-color 0.15s;
+  }
+  .auth-input:focus { border-color: rgba(26,24,20,0.5); }
+
+  .auth-submit {
+    width: 100%; padding: 11px; margin-top: 0.5rem;
+    background: #1A1814; color: #F8F5EF;
+    border: none; border-radius: 8px;
+    font-family: 'Geist', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .auth-submit:hover { opacity: 0.85; }
+  .auth-submit:disabled { opacity: 0.5; cursor: default; }
+
+  .auth-toggle {
+    text-align: center; margin-top: 1rem;
+    font-size: 13px; color: rgba(26,24,20,0.6);
+  }
+  .auth-toggle a {
+    color: #1A1814; font-weight: 500;
+    cursor: pointer; text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .auth-msg {
+    padding: 9px 12px; margin-bottom: 1rem;
+    border-radius: 7px; font-size: 12px; line-height: 1.5;
+    display: none;
+  }
+  .auth-msg.show { display: block; }
+  .auth-msg.error { background: #FCEBEB; color: #791F1F; border: 1px solid rgba(121,31,31,0.2); }
+  .auth-msg.success { background: #EAF3DE; color: #3B6D11; border: 1px solid rgba(59,109,17,0.2); }
+  .auth-msg.info { background: #F0E8D4; color: #854F0B; border: 1px solid rgba(184,151,74,0.25); }
+
+  .auth-footer-note {
+    font-size: 11px; color: rgba(26,24,20,0.4);
+    text-align: center; margin-top: 1rem;
+    line-height: 1.5;
+  }
+</style>
+
+<div class="auth-overlay" id="authOverlay" onclick="if(event.target===this) closeAuth()">
+  <div class="auth-modal">
+    <button class="auth-close" onclick="closeAuth()" aria-label="Close">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="3" y1="3" x2="11" y2="11"/><line x1="11" y1="3" x2="3" y2="11"/></svg>
+    </button>
+
+    <div class="auth-logo">
+      <div class="auth-logomark">
+        <svg viewBox="0 0 16 16"><path d="M8 2L8 14M4 5L8 2L12 5"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="4" y1="11" x2="12" y2="11"/></svg>
+      </div>
+      <span class="auth-logotext">Lex<em>AI</em></span>
+    </div>
+
+    <h2 class="auth-title" id="authTitle">Welcome back</h2>
+    <p class="auth-sub" id="authSub">Sign in to continue your incorporation.</p>
+
+    <div class="auth-msg" id="authMsg"></div>
+
+    <button class="auth-google" id="googleBtn" onclick="signInWithGoogle()">
+      <svg viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="auth-divider">or</div>
+
+    <form id="authForm" onsubmit="handleAuthSubmit(event)">
+      <div class="auth-field">
+        <label class="auth-label" for="authEmail">Email</label>
+        <input class="auth-input" id="authEmail" type="email" required autocomplete="email" placeholder="you@company.com">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label" for="authPassword">Password</label>
+        <input class="auth-input" id="authPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters">
+      </div>
+      <button class="auth-submit" id="authSubmitBtn" type="submit">Sign in</button>
+    </form>
+
+    <div class="auth-toggle" id="authToggle">
+      Don't have an account? <a onclick="toggleAuthMode()">Sign up</a>
+    </div>
+
+    <p class="auth-footer-note">By continuing, you agree to LexAI's Terms of Service and Privacy Policy. LexAI is not a law firm; use does not create an attorney-client relationship.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SUPABASE AUTH LOGIC
+══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Define functions on window FIRST so onclick handlers always find them,
+  // even if Supabase fails to load or throws errors.
+  var supabase = null;
+  var authMode = 'signin';
+  const SUPABASE_URL = 'https://ujvnguphvlmuqcwrrsdz.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqdm5ndXBodmxtdXFjd3Jyc2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTI1OTYsImV4cCI6MjA5MjI4ODU5Nn0.6uQkFiVE6B3tTTQWhloJbtLJE5s1Qu5vrDITmsl3KJk';
+
+  // ── MODAL CONTROL ─────────────────────────────
+  window.openAuth = function(mode) {
+    authMode = mode || 'signin';
+    updateAuthUI();
+    document.getElementById('authOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('authEmail').focus(), 100);
+  };
+
+  window.closeAuth = function() {
+    document.getElementById('authOverlay').classList.remove('open');
+    clearAuthMsg();
+  };
+
+  window.toggleAuthMode = function() {
+    authMode = authMode === 'signin' ? 'signup' : 'signin';
+    updateAuthUI();
+    clearAuthMsg();
+  };
+
+  function updateAuthUI() {
+    const isSignup = authMode === 'signup';
+    document.getElementById('authTitle').innerHTML = isSignup ? 'Create your <em>account</em>' : 'Welcome <em>back</em>';
+    document.getElementById('authSub').textContent = isSignup
+      ? 'Start incorporating your business in minutes.'
+      : 'Sign in to continue your incorporation.';
+    document.getElementById('authSubmitBtn').textContent = isSignup ? 'Create account' : 'Sign in';
+    document.getElementById('authPassword').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+    document.getElementById('authToggle').innerHTML = isSignup
+      ? 'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>'
+      : 'Don\'t have an account? <a onclick="toggleAuthMode()">Sign up</a>';
+  }
+
+  function showAuthMsg(text, type) {
+    const msg = document.getElementById('authMsg');
+    msg.textContent = text;
+    msg.className = 'auth-msg show ' + (type || 'error');
+  }
+  function clearAuthMsg() {
+    const msg = document.getElementById('authMsg');
+    if (msg) msg.className = 'auth-msg';
+  }
+
+  // ── EMAIL + PASSWORD ──────────────────────────
+  window.handleAuthSubmit = async function(e) {
+    e.preventDefault();
+    clearAuthMsg();
+    if (!supabase) { showAuthMsg('Authentication service unavailable. Please refresh the page.', 'error'); return; }
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = authMode === 'signup' ? 'Creating account...' : 'Signing in...';
+
+    try {
+      if (authMode === 'signup') {
+        const { data, error } = await supabase.auth.signUp({
+          email, password,
+          options: { emailRedirectTo: window.location.origin + '/lexai-chat.html' }
+        });
+        if (error) throw error;
+        if (data.session) {
+          showAuthMsg('Account created! Redirecting to chat...', 'success');
+          setTimeout(() => window.location.href = 'lexai-chat.html', 800);
+        } else {
+          showAuthMsg('Check your email to verify your account, then sign in.', 'info');
+          btn.disabled = false;
+          btn.textContent = 'Create account';
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        showAuthMsg('Signed in! Redirecting...', 'success');
+        setTimeout(() => window.location.href = 'lexai-chat.html', 600);
+      }
+    } catch (err) {
+      let friendly = err.message || 'Something went wrong. Please try again.';
+      if (/invalid login/i.test(friendly)) friendly = 'Incorrect email or password.';
+      else if (/already registered/i.test(friendly)) friendly = 'An account with this email already exists. Try signing in instead.';
+      else if (/email.*confirm/i.test(friendly)) friendly = 'Please check your email to confirm your account before signing in.';
+      showAuthMsg(friendly, 'error');
+      btn.disabled = false;
+      btn.textContent = authMode === 'signup' ? 'Create account' : 'Sign in';
+    }
+  };
+
+  // ── GOOGLE OAUTH ──────────────────────────────
+  window.signInWithGoogle = async function() {
+    if (!supabase) {
+      alert('Authentication service is still loading. Please wait a moment and try again.');
+      return;
+    }
+    if (document.getElementById('authOverlay').classList.contains('open')) {
+      clearAuthMsg();
+    }
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin + '/lexai-chat.html' }
+      });
+      if (error) throw error;
+    } catch (err) {
+      const errMsg = (err && err.message) || 'Google sign-in failed. Make sure Google OAuth is enabled in your Supabase project.';
+      if (document.getElementById('authOverlay').classList.contains('open')) {
+        showAuthMsg(errMsg, 'error');
+      } else {
+        alert(errMsg);
+      }
+    }
+  };
+
+  // ── SESSION CHECK ─────────────────────────────
+  async function checkSession() {
+    if (!supabase) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        document.querySelectorAll('button').forEach(btn => {
+          if (btn.textContent.trim() === 'Sign in') {
+            btn.textContent = 'Open chat';
+            btn.onclick = () => window.location.href = 'lexai-chat.html';
+          }
+        });
+      }
+    } catch (e) { /* noop */ }
+  }
+
+  // ── ESCAPE KEY CLOSES MODAL ───────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && typeof closeAuth === 'function') closeAuth();
+  });
+
+  // Initialize Supabase (do this last so function definitions are available first)
+  try {
+    if (window.supabase && window.supabase.createClient) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      checkSession();
+    } else {
+      console.warn('Supabase SDK failed to load. Auth features will be unavailable.');
+    }
+  } catch (e) {
+    console.error('Supabase initialization error:', e);
+  }
+</script>
+
+</body>
+</html>

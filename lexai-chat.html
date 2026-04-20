@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LexAI — Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #F8F5EF; --ink: #1A1814;
+  --ink60: rgba(26,24,20,0.6); --ink30: rgba(26,24,20,0.3);
+  --ink20: rgba(26,24,20,0.2); --ink10: rgba(26,24,20,0.10); --ink06: rgba(26,24,20,0.06);
+  --gold: #B8974A; --gold-bg: #F0E8D4;
+  --green: #3B6D11; --green-bg: #EAF3DE;
+  --sw: 260px; --hh: 56px;
+}
+html, body { height: 100%; overflow: hidden; font-family: 'Geist', sans-serif; background: var(--cream); color: var(--ink); }
+::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-thumb { background: var(--ink20); border-radius: 3px; }
+
+/* HEADER */
+header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--hh); display: flex; align-items: center; background: rgba(248,245,239,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--ink10); }
+.h-logo { width: var(--sw); height: 100%; display: flex; align-items: center; gap: 10px; padding: 0 1rem; border-right: 1px solid var(--ink10); text-decoration: none; flex-shrink: 0; }
+.h-logomark { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--ink20); display: flex; align-items: center; justify-content: center; }
+.h-logomark svg { width: 14px; height: 14px; stroke: var(--ink); fill: none; stroke-width: 1.5; }
+.h-logotext { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--ink); }
+.h-logotext em { font-style: italic; font-weight: 400; }
+.h-newbtn { margin-left: auto; width: 26px; height: 26px; border-radius: 5px; border: 1px solid var(--ink20); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.h-newbtn:hover { background: var(--ink10); }
+.h-newbtn svg { width: 12px; height: 12px; stroke: var(--ink60); fill: none; stroke-width: 1.5; }
+.h-center { flex: 1; padding: 0 1.5rem; display: flex; align-items: center; gap: 8px; }
+.h-title { font-size: 13px; font-weight: 500; }
+.h-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 10px; background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(184,151,74,0.3); display: none; }
+.h-right { display: flex; align-items: center; gap: 8px; padding-right: 1rem; }
+.h-docbtn { font-size: 12px; color: var(--ink60); background: transparent; border: 1px solid var(--ink20); border-radius: 6px; padding: 6px 12px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.h-docbtn:hover { background: var(--ink06); color: var(--ink); }
+.h-docbtn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+.h-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--gold-bg); border: 1px solid rgba(184,151,74,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; color: var(--gold); cursor: pointer; }
+
+/* LAYOUT */
+.layout { display: flex; height: 100%; padding-top: var(--hh); }
+
+/* SIDEBAR */
+.sidebar { width: var(--sw); flex-shrink: 0; border-right: 1px solid var(--ink10); background: #fff; display: flex; flex-direction: column; overflow: hidden; }
+.sb-sec { padding: 1rem 0.75rem 0.5rem; }
+.sb-lbl { font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--ink30); padding: 0 0.5rem; margin-bottom: 4px; }
+.sb-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; font-size: 13px; color: var(--ink60); cursor: pointer; transition: all 0.15s; border: 1px solid transparent; text-decoration: none; }
+.sb-item:hover, .sb-item.active { background: var(--cream); color: var(--ink); border-color: var(--ink10); }
+.sb-item svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; }
+.sb-div { height: 1px; background: var(--ink10); margin: 0.5rem 0.75rem; }
+.sb-hist { flex: 1; overflow-y: auto; padding: 0 0.75rem 1rem; }
+.sb-hi { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px; font-size: 12px; color: var(--ink60); cursor: pointer; transition: background 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-hi:hover { background: var(--cream); color: var(--ink); }
+.sb-hi svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; opacity: 0.4; }
+.sb-foot { padding: 0.75rem; border-top: 1px solid var(--ink10); }
+.sb-user { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.sb-user:hover { background: var(--cream); }
+.sb-av { width: 28px; height: 28px; border-radius: 50%; background: var(--gold-bg); border: 1px solid rgba(184,151,74,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; color: var(--gold); flex-shrink: 0; }
+.sb-name { font-size: 12px; font-weight: 500; } .sb-plan { font-size: 10px; color: var(--ink30); }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+/* MESSAGES */
+.messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.messages.wmode { justify-content: center; align-items: center; padding: 2rem 1.5rem; }
+.messages.cmode { justify-content: flex-start; align-items: stretch; padding: 2rem 0 1rem; }
+
+/* WELCOME */
+.welcome { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 480px; width: 100%; }
+.w-icon { width: 50px; height: 50px; background: var(--ink); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; }
+.w-icon svg { width: 22px; height: 22px; stroke: var(--cream); fill: none; stroke-width: 1.5; }
+.w-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; margin-bottom: 0.5rem; }
+.w-sub { font-size: 14px; color: var(--ink60); line-height: 1.65; margin-bottom: 2rem; font-weight: 300; }
+.starters { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.starter { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #fff; border: 1px solid var(--ink10); border-radius: 10px; cursor: pointer; text-align: left; transition: all 0.15s; font-family: 'Geist', sans-serif; width: 100%; }
+.starter:hover { border-color: var(--ink20); background: var(--cream); }
+.st-icon { width: 30px; height: 30px; flex-shrink: 0; border-radius: 7px; background: var(--cream); border: 1px solid var(--ink10); display: flex; align-items: center; justify-content: center; }
+.st-icon svg { width: 14px; height: 14px; stroke: var(--ink60); fill: none; stroke-width: 1.5; }
+.st-text { flex: 1; font-size: 13px; color: var(--ink); }
+.st-arr svg { width: 12px; height: 12px; stroke: var(--ink30); fill: none; stroke-width: 1.5; }
+
+/* MESSAGE ROWS */
+.mr { width: 100%; max-width: 720px; margin: 0 auto 1.25rem; padding: 0 1.5rem; animation: fu 0.25s ease both; }
+@keyframes fu { from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;} }
+.ur { display: flex; justify-content: flex-end; }
+.ub { background: var(--ink); color: var(--cream); border-radius: 14px 4px 14px 14px; padding: 10px 15px; font-size: 14px; line-height: 1.6; max-width: 75%; }
+.ar { display: flex; align-items: flex-start; gap: 11px; }
+.a-av { width: 27px; height: 27px; background: var(--ink); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.a-av svg { width: 12px; height: 12px; stroke: var(--cream); fill: none; stroke-width: 1.5; }
+.a-con { flex: 1; min-width: 0; }
+.a-name { font-size: 10px; font-weight: 500; color: var(--ink30); letter-spacing: 0.5px; margin-bottom: 5px; }
+.a-text { font-size: 14px; line-height: 1.75; color: var(--ink); }
+.a-text p { margin-bottom: 0.65rem; } .a-text p:last-child { margin-bottom: 0; }
+
+/* TYPING */
+.tdots { display: flex; gap: 4px; padding: 8px 0 4px; }
+.td { width: 7px; height: 7px; border-radius: 50%; background: var(--ink30); animation: tb 1.2s infinite ease-in-out; }
+.td:nth-child(2){animation-delay:0.2s;} .td:nth-child(3){animation-delay:0.4s;}
+@keyframes tb{0%,80%,100%{transform:translateY(0);opacity:0.4;}40%{transform:translateY(-5px);opacity:1;}}
+
+/* CHOICES */
+.cw { margin-top: 10px; }
+.ch { font-size: 11px; color: var(--ink30); margin-bottom: 7px; }
+.choices { display: flex; flex-wrap: wrap; gap: 7px; }
+.choice { font-family:'Geist',sans-serif; font-size:13px; color:var(--ink); background:#fff; border:1px solid var(--ink20); border-radius:8px; padding:8px 14px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:7px; }
+.choice:hover { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+.choice.sel { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+.choice.off { opacity:0.35; pointer-events:none; }
+.mc-btn { margin-top:10px; display:none; font-family:'Geist',sans-serif; font-size:13px; font-weight:500; color:var(--cream); background:var(--ink); border:none; border-radius:8px; padding:9px 18px; cursor:pointer; align-items:center; gap:7px; }
+.mc-btn.show { display:inline-flex; }
+.mc-btn svg { width:12px; height:12px; stroke:var(--cream); fill:none; stroke-width:2; }
+
+/* SUGGESTIONS */
+.suggs { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+.sugg { font-family:'Geist',sans-serif; font-size:12px; color:var(--ink60); background:#fff; border:1px solid var(--ink20); border-radius:20px; padding:5px 12px; cursor:pointer; transition:all 0.15s; }
+.sugg:hover { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+.sugg:disabled { opacity:0.35; pointer-events:none; }
+
+/* DOC CARDS */
+.dcards { display:flex; flex-direction:column; gap:7px; margin-top:10px; }
+.dcard { display:flex; align-items:center; gap:11px; border:1px solid var(--ink10); border-radius:9px; padding:10px 13px; background:#fff; text-decoration:none; transition:border-color 0.15s; }
+.dcard:hover { border-color:var(--ink20); }
+.di { width:30px; height:36px; border-radius:4px; background:var(--gold-bg); border:1px solid rgba(184,151,74,0.25); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.di svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:1.5; }
+.dn { font-size:13px; font-weight:500; color:var(--ink); }
+.dd { font-size:11px; color:var(--ink60); margin-top:1px; }
+.db { font-size:10px; font-weight:500; padding:2px 8px; border-radius:10px; background:var(--gold-bg); color:var(--gold); border:1px solid rgba(184,151,74,0.25); white-space:nowrap; }
+.darr svg { width:13px; height:13px; stroke:var(--ink30); fill:none; stroke-width:1.5; }
+
+/* SUMMARY */
+.summ { border:1px solid var(--ink10); border-radius:9px; background:#fff; overflow:hidden; margin-top:10px; }
+.sh { padding:8px 13px; background:var(--cream); border-bottom:1px solid var(--ink10); font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink30); display:flex; align-items:center; gap:6px; }
+.sh svg { width:11px; height:11px; stroke:var(--ink30); fill:none; stroke-width:1.5; }
+.sr { display:flex; padding:8px 13px; border-bottom:1px solid rgba(26,24,20,0.04); font-size:13px; }
+.sr:last-child { border-bottom:none; }
+.sk { width:130px; flex-shrink:0; color:var(--ink60); font-size:12px; }
+.sv { font-weight:500; }
+.stag { display:inline-block; font-size:10px; font-weight:500; padding:1px 7px; border-radius:8px; margin-left:6px; background:var(--green-bg); color:var(--green); }
+
+/* ATTY + PROGRESS */
+.an { display:none; align-items:center; gap:7px; padding:6px 10px; border-radius:6px; background:var(--gold-bg); border:1px solid rgba(184,151,74,0.25); font-size:11px; color:var(--gold); font-weight:500; margin-bottom:8px; width:100%; max-width:720px; }
+.an.show { display:flex; }
+.an svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:1.5; flex-shrink:0; }
+.pg { display:none; width:100%; max-width:720px; margin-bottom:8px; }
+.pg.show { display:block; }
+.pt { height:2px; background:var(--ink10); border-radius:2px; overflow:hidden; }
+.pf { height:100%; background:var(--gold); border-radius:2px; transition:width 0.5s ease; width:0%; }
+.pl { font-size:10px; color:var(--ink30); text-align:right; margin-top:3px; }
+
+/* INPUT */
+.ia { flex-shrink:0; padding:0.75rem 1.5rem 1.25rem; display:flex; flex-direction:column; align-items:center; background:var(--cream); }
+.ib { width:100%; max-width:720px; background:#fff; border:1px solid var(--ink20); border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(26,24,20,0.06); transition:border-color 0.2s; }
+.ib:focus-within { border-color:var(--ink60); }
+.it { width:100%; border:none; outline:none; font-family:'Geist',sans-serif; font-size:14px; color:var(--ink); background:transparent; padding:13px 16px 6px; resize:none; line-height:1.5; max-height:150px; }
+.it::placeholder { color:var(--ink30); }
+.if { display:flex; align-items:center; justify-content:space-between; padding:5px 10px 9px; }
+.iab { display:flex; gap:2px; }
+.iabtn { width:28px; height:28px; border-radius:6px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink30); transition:background 0.15s; }
+.iabtn:hover { background:var(--ink06); color:var(--ink); }
+.iabtn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.5; }
+.sbtn { width:32px; height:32px; border-radius:8px; background:var(--ink); border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity 0.2s; }
+.sbtn:hover { opacity:0.82; }
+.sbtn svg { width:13px; height:13px; stroke:var(--cream); fill:none; stroke-width:2; }
+.ih { font-size:11px; color:var(--ink30); text-align:center; margin-top:7px; }
+
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .h-logo{width:auto;border-right:none;padding-right:0;}
+  .h-newbtn{margin-left:8px;}
+  .h-docbtn{display:none;}
+  .h-center{padding:0 0.75rem;font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-logo">
+    <a href="lexai.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+      <div class="h-logomark"><svg viewBox="0 0 16 16"><path d="M8 2L8 14M4 5L8 2L12 5"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="4" y1="11" x2="12" y2="11"/></svg></div>
+      <span class="h-logotext">Lex<em>AI</em></span>
+    </a>
+    <button class="h-newbtn" id="newBtn" title="New chat" onclick="newChat()">
+      <svg viewBox="0 0 14 14"><line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/></svg>
+    </button>
+  </div>
+  <div class="h-center">
+    <span class="h-title" id="hTitle">New conversation</span>
+    <span class="h-badge" id="hBadge">In progress</span>
+  </div>
+  <div class="h-right">
+    <a href="https://www.businessdocs.ca" target="_blank" class="h-docbtn">
+      <svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v9H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg>
+      Document store
+    </a>
+    <div style="position:relative;">
+      <button class="h-avatar" id="avatarBtn" onclick="toggleUserMenu()" style="border:none;">JD</button>
+      <div id="userMenu" style="display:none;position:absolute;top:36px;right:0;min-width:200px;background:#fff;border:1px solid var(--ink10);border-radius:8px;box-shadow:0 8px 24px rgba(26,24,20,0.12);z-index:200;padding:6px;">
+        <div id="userMenuEmail" style="padding:8px 10px;font-size:11px;color:var(--ink60);border-bottom:1px solid var(--ink10);margin-bottom:4px;word-break:break-all;">Loading...</div>
+        <button onclick="handleLogout()" style="width:100%;text-align:left;padding:8px 10px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-family:'Geist',sans-serif;font-size:13px;color:var(--ink);display:flex;align-items:center;gap:8px;">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3Q2 2 2 3V11Q2 12 3 12H6"/><polyline points="9,4 12,7 9,10"/><line x1="12" y1="7" x2="5" y2="7"/></svg>
+          Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-sec">
+      <div class="sb-lbl">Menu</div>
+      <div class="sb-item active" onclick="newChat()"><svg viewBox="0 0 14 14"><path d="M2 12Q2 13 3 13H11Q12 13 12 12V5Q12 4 11 4H8L6 2H3Q2 2 2 3Z"/></svg>Chat with LexAI</div>
+      <a class="sb-item" href="https://www.businessdocs.ca" target="_blank"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v9H2z"/><path d="M9 1v3h3"/></svg>Document store</a>
+      <div class="sb-item" onclick="startFlow('onboard')"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><polyline points="4,7 6,9 10,5"/></svg>Incorporation checklist</div>
+      <div class="sb-item" onclick="alert('My Filings is coming soon — track your incorporation status and document submissions here.')"><svg viewBox="0 0 14 14"><rect x="1" y="3" width="12" height="9" rx="1.5"/><path d="M9 3V2a2 2 0 00-4 0v1"/></svg>My filings</div>
+    </div>
+    <div class="sb-div"></div>
+    <div class="sb-sec"><div class="sb-lbl">Recent</div></div>
+    <div class="sb-hist">
+      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>Delaware C-Corp setup</div>
+      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>Founder equity split</div>
+      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>LLC vs S-Corp</div>
+      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>83(b) election timing</div>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-av">JD</div>
+        <div><div class="sb-name">Jane Doe</div><div class="sb-plan">Founder plan</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="messages wmode" id="msgs"></div>
+    <div class="ia">
+      <div class="an" id="an"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 10c0-2.2 1.8-4 4-4s4 1.8 4 4"/><polyline points="4.5,8.5 6,10 8,7" stroke-width="1.5"/></svg>In-house attorney reviews &amp; signs all documents before delivery</div>
+      <div class="pg" id="pg"><div class="pt"><div class="pf" id="pf"></div></div><div class="pl" id="pl">Step 1 of 6</div></div>
+      <div class="ib">
+        <textarea class="it" id="ta" rows="1" placeholder="Ask anything about incorporation, business structure, or legal documents…"></textarea>
+        <div class="if">
+          <div class="iab">
+            <button class="iabtn"><svg viewBox="0 0 14 14"><path d="M12 7.5L6.5 13A4 4 0 011 8l6.5-6.5a2.5 2.5 0 013.5 3.5L5 11A1 1 0 013.5 9.5L8 5"/></svg></button>
+            <button class="iabtn"><svg viewBox="0 0 14 14"><rect x="4.5" y="1" width="5" height="7" rx="2.5"/><path d="M2 7.5a5 5 0 0010 0"/><line x1="7" y1="12.5" x2="7" y2="14"/><line x1="4" y1="14" x2="10" y2="14"/></svg></button>
+          </div>
+          <button class="sbtn" onclick="send()"><svg viewBox="0 0 14 14"><line x1="2" y1="12" x2="12" y2="2"/><polyline points="6,2 12,2 12,8"/></svg></button>
+        </div>
+      </div>
+      <p class="ih">LexAI is an educational tool. All documents are reviewed &amp; signed by our in-house licensed attorney.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────
+var inChat = false;
+var flow = 'none';
+var obStep = 0;
+var obAns = {};
+var turn = 0;
+
+// ── DOM ────────────────────────────────────
+var EL = {
+  msgs: document.getElementById('msgs'),
+  ta:   document.getElementById('ta'),
+  ht:   document.getElementById('hTitle'),
+  hb:   document.getElementById('hBadge'),
+  pg:   document.getElementById('pg'),
+  pf:   document.getElementById('pf'),
+  pl:   document.getElementById('pl'),
+  an:   document.getElementById('an'),
+};
+
+// ── ONBOARDING DATA ─────────────────────────
+var OB = [
+  { id:'goal', q:"Let's find the best structure for your business. What's the <strong>primary goal</strong>?", type:'s', choices:[
+    {e:'🚀',l:'Raise venture capital / investors'},{e:'💼',l:'Run a small or solo business'},
+    {e:'🤝',l:'Partnership between co-founders'},{e:'🏢',l:'Larger team or established company'},{e:'🔒',l:'Asset protection / holding company'}]},
+  { id:'size', q:"How many <strong>people</strong> will be part of this business?", type:'s', choices:[
+    {e:'👤',l:'Just me (solo founder)'},{e:'👥',l:'2–3 co-founders'},
+    {e:'🏃',l:'4–10 employees'},{e:'🏗️',l:'11–50 employees'},{e:'🏢',l:'50+ employees'}]},
+  { id:'rev', q:"Expected <strong>revenue or funding</strong> in year one?", type:'s', choices:[
+    {e:'🌱',l:'Pre-revenue / just starting'},{e:'💵',l:'Under $250K annually'},
+    {e:'📈',l:'$250K – $1M annually'},{e:'🚀',l:'Seeking seed or Series A funding'},{e:'🏦',l:'Already funded or $1M+'}]},
+  { id:'state', q:"Which <strong>state</strong> are you incorporating in?", type:'s', choices:[
+    {e:'🏛️',l:'Delaware (recommended for VC)'},{e:'⚡',l:'Nevada or Wyoming (privacy)'},
+    {e:'🌟',l:'California'},{e:'🗽',l:'New York'},{e:'📍',l:'My home state (other)'}]},
+  { id:'extras', q:"Which situations apply? <strong>Select all that apply.</strong>", type:'m', choices:[
+    {e:'📋',l:'I have co-founders (equity split needed)'},{e:'💡',l:'I have pre-existing IP to transfer'},
+    {e:'🤫',l:'Sharing confidential info with partners'},{e:'👷',l:'Plan to hire employees soon'},
+    {e:'📊',l:'Need a board of directors'},{e:'💰',l:'Raising outside investment'}]},
+  { id:'when', q:"What's your <strong>timeline</strong>?", type:'s', choices:[
+    {e:'⚡',l:'ASAP — this week'},{e:'📅',l:'Within the next month'},
+    {e:'🗓️',l:'1–3 months from now'},{e:'🤔',l:'Just exploring for now'}]},
+];
+
+// ── WELCOME ─────────────────────────────────
+function showWelcome() {
+  inChat = false; flow = 'none'; obStep = 0; obAns = {}; turn = 0;
+  EL.msgs.className = 'messages wmode';
+  EL.msgs.innerHTML = '';
+  EL.ht.textContent = 'New conversation';
+  EL.hb.style.display = 'none';
+  EL.pg.className = 'pg';
+  EL.pf.style.width = '0%';
+  EL.pl.textContent = 'Step 1 of 6';
+  EL.an.className = 'an';
+  EL.ta.value = ''; EL.ta.style.height = 'auto';
+
+  var w = document.createElement('div');
+  w.className = 'welcome';
+  w.innerHTML =
+    '<div class="w-icon"><svg viewBox="0 0 22 22"><path d="M8 2L8 20M5 6L8 2L11 6"/><line x1="5" y1="10" x2="17" y2="10"/><line x1="5" y1="14" x2="17" y2="14"/><line x1="5" y1="18" x2="12" y2="18"/></svg></div>' +
+    '<h1 class="w-title">How can I help you today?</h1>' +
+    '<p class="w-sub">I\'ll guide you through incorporating your business, recommend the right documents, and connect you with attorney-reviewed templates.</p>' +
+    '<div class="starters">' +
+      btn('starter','startFlow(\'onboard\')','<path d="M7 1L13 7L7 13L1 7Z"/>','<strong>Start from scratch</strong> — help me incorporate my business') +
+      btn('starter','startFlow(\'docs\')','<path d="M2 1h8l2 2v9H2z"/><path d="M9 1v3h3"/>','<strong>Find documents</strong> — I know what I need') +
+      btn('starter','startFlow(\'qa\')','<circle cx="7" cy="7" r="5"/><line x1="7" y1="5" x2="7" y2="9"/><circle cx="7" cy="3.5" r="0.6" fill="currentColor" stroke="none"/>','<strong>Ask a legal question</strong> — explain a concept to me') +
+      btn('starter','startFlow(\'structure\')','<rect x="1" y="8" width="4" height="5" rx="1"/><rect x="5" y="5" width="4" height="8" rx="1"/><rect x="9" y="2" width="4" height="11" rx="1"/>','<strong>Review my business structure</strong> — get a recommendation') +
+    '</div>';
+  EL.msgs.appendChild(w);
+}
+
+function btn(cls, onclick, svgPath, label) {
+  return '<button class="' + cls + '" onclick="' + onclick + '">' +
+    '<div class="st-icon"><svg viewBox="0 0 14 14">' + svgPath + '</svg></div>' +
+    '<span class="st-text">' + label + '</span>' +
+    '<span class="st-arr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></span>' +
+    '</button>';
+}
+
+// ── ENTER CHAT MODE ─────────────────────────
+function enterChat() {
+  if (inChat) return;
+  inChat = true;
+  EL.msgs.className = 'messages cmode';
+  EL.msgs.innerHTML = '';
+  EL.hb.style.display = 'inline-block';
+}
+
+// ── FLOW STARTERS ───────────────────────────
+function startFlow(f) {
+  flow = f; turn = 0;
+  enterChat();
+  if (f === 'onboard') {
+    obStep = 0; obAns = {};
+    EL.ht.textContent = 'Incorporation assessment';
+    EL.pg.className = 'pg show';
+    setProg(1);
+    typeThen(800, function() {
+      addAI('<p>Great — I\'ll ask <strong>6 quick questions</strong> to figure out the best structure and which documents you\'ll need. Just pick what fits best.</p>');
+      setTimeout(function(){ typeThen(700, showOBStep); }, 900);
+    });
+  } else if (f === 'docs') {
+    EL.ht.textContent = 'Document finder';
+    EL.an.className = 'an show';
+    typeThen(700, function() {
+      addAI('<p>What kind of document are you looking for? Describe it in plain English and I\'ll match you to the right template in the store.</p>',
+        suggs(['I need an NDA for a business partner','I want a vesting agreement for my co-founder','I need to transfer my IP to my company','I\'m looking for corporate bylaws']));
+    });
+  } else if (f === 'qa') {
+    EL.ht.textContent = 'Legal Q&A';
+    typeThen(700, function() {
+      addAI('<p>Ask me anything about business formation, corporate law, equity, or filings — I\'ll explain it in plain English.</p>',
+        suggs(['What is an 83(b) election?','What\'s the difference between an LLC and a C-Corp?','How does founder vesting work?','When do I need a board of directors?']));
+    });
+  } else if (f === 'structure') {
+    EL.ht.textContent = 'Business structure review';
+    typeThen(700, function() {
+      addAI('<p>Tell me about your current situation — entity type, how many founders, what state you\'re in, and whether you plan to raise capital.</p>',
+        suggs(['I\'m a solo founder, not incorporated yet','I have 2 co-founders deciding on structure','I have an LLC but want to raise investment','I\'m already incorporated — want a checkup']));
+    });
+  }
+}
+
+// ── ONBOARDING ──────────────────────────────
+function setProg(n, done) {
+  EL.pf.style.width = (done ? 100 : Math.round(((n-1)/OB.length)*100)) + '%';
+  EL.pl.textContent = done ? 'Complete' : 'Step ' + n + ' of ' + OB.length;
+}
+
+function showOBStep() {
+  var s = OB[obStep]; obStep++;
+  addAI('<p>' + s.q + '</p>', makeChoices(s, obStep-1));
+}
+
+function makeChoices(s, si) {
+  var multi = s.type === 'm';
+  var uid = 'cg' + si;
+  var h = '<div class="cw">';
+  if (multi) h += '<div class="ch">Select all that apply, then click Continue</div>';
+  h += '<div class="choices" id="' + uid + '">';
+  s.choices.forEach(function(c,i){
+    h += '<button class="choice" onclick="pick(\'' + uid + '\',' + i + ',' + multi + ',' + si + ')">' + c.e + ' ' + c.l + '</button>';
+  });
+  h += '</div>';
+  if (multi) h += '<button class="mc-btn" id="mc' + si + '" onclick="submitMulti(\'' + uid + '\',' + si + ')">Continue <svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></button>';
+  h += '</div>';
+  return h;
+}
+
+function pick(uid, idx, multi, si) {
+  var btns = document.querySelectorAll('#' + uid + ' .choice');
+  if (!multi) {
+    btns.forEach(function(b){ b.classList.add('off'); });
+    btns[idx].classList.add('sel');
+    var label = OB[si].choices[idx].l;
+    obAns[OB[si].id] = label;
+    setTimeout(function(){ advOB(label); }, 400);
+  } else {
+    btns[idx].classList.toggle('sel');
+    var any = [].some.call(btns, function(b){ return b.classList.contains('sel'); });
+    var mc = document.getElementById('mc' + si);
+    if (mc) mc.className = 'mc-btn' + (any ? ' show' : '');
+  }
+}
+
+function submitMulti(uid, si) {
+  var btns = document.querySelectorAll('#' + uid + ' .choice');
+  var sel = [];
+  btns.forEach(function(b,i){ if(b.classList.contains('sel')) sel.push(OB[si].choices[i].l); });
+  btns.forEach(function(b){ b.classList.add('off'); });
+  var mc = document.getElementById('mc' + si); if(mc) mc.style.display='none';
+  obAns[OB[si].id] = sel;
+  advOB(sel.length ? sel.join(', ') : 'None of the above');
+}
+
+function advOB(label) {
+  addUser(label);
+  if (obStep < OB.length) { setProg(obStep+1); typeThen(900, showOBStep); }
+  else { setProg(OB.length,true); typeThen(1200, showRecs); }
+}
+
+function showRecs() {
+  var goal = obAns.goal || ''; var size = obAns.size || '';
+  var extras = Array.isArray(obAns.extras) ? obAns.extras : [];
+  var isVC   = /venture|invest/i.test(goal) || extras.some(function(e){return /invest/i.test(e);});
+  var isSolo = /solo|just me/i.test(size);
+  var rec  = isVC ? 'C-Corporation (Delaware)' : isSolo ? 'Single-Member LLC' : 'LLC or C-Corp';
+  var note = isVC ? 'Investors strongly prefer C-Corps for equity flexibility. Delaware is the standard.'
+           : isSolo ? 'An LLC gives liability protection with minimal overhead — ideal for solo founders.'
+           : 'Either structure could work. We\'ll walk through the trade-offs in more detail.';
+
+  var docs = [
+    {n:isVC?'Articles of Incorporation (Delaware C-Corp)':'Articles of Organization', d:'Primary formation document', b:isVC?'C-Corp':'LLC'},
+    {n:isVC?'Corporate Bylaws':'LLC Operating Agreement', d:'Governance and operating rules', b:'Required'},
+  ];
+  if(extras.some(function(e){return /co-founder/i.test(e);})) docs.push({n:'Founder Vesting Agreement',d:'4-year vest, 1-year cliff',b:'Equity'});
+  if(extras.some(function(e){return /IP/i.test(e);}))         docs.push({n:'IP Assignment Agreement',d:'Transfer pre-company IP to entity',b:'IP'});
+  if(extras.some(function(e){return /confidential/i.test(e);})) docs.push({n:'Mutual NDA',d:'Protect confidential discussions',b:'Privacy'});
+  if(extras.some(function(e){return /employ/i.test(e);}))     docs.push({n:'Employment Agreement',d:'Contractor and employee terms',b:'HR'});
+  if(isVC||extras.some(function(e){return /invest/i.test(e);})) docs.push({n:'Board Consent Resolution',d:'Initial organizational consent',b:'Governance'});
+  docs.push({n:'83(b) Election Letter',d:'IRS filing — submit within 30 days',b:'Tax'});
+
+  var sumH = '<div class="summ"><div class="sh"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><polyline points="4,6 5.5,7.5 8.5,4.5"/></svg>Your profile</div>'
+    + row('Goal', obAns.goal||'—') + row('Team', obAns.size||'—') + row('Revenue', obAns.rev||'—')
+    + row('State', obAns.state||'—') + '<div class="sr"><span class="sk">Entity</span><span class="sv">' + rec + ' <span class="stag">Best fit</span></span></div></div>';
+
+  var dcH = '<div class="dcards">' + docs.map(function(d){
+    return '<a class="dcard" href="https://www.businessdocs.ca" target="_blank">'
+      +'<div class="di"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>'
+      +'<div style="flex:1"><div class="dn">'+d.n+'</div><div class="dd">'+d.d+'</div></div>'
+      +'<span class="db">'+d.b+'</span><div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></a>';
+  }).join('') + '</div>';
+
+  EL.ht.textContent = 'Incorporation plan ready';
+  EL.hb.style.cssText = 'display:inline-block;background:var(--green-bg);color:var(--green);border:1px solid rgba(59,109,17,0.2)';
+  EL.an.className = 'an show';
+  EL.pg.className = 'pg';
+
+  addAI('<p><strong>Recommended: ' + rec + '</strong><br>' + note + '</p><p>Here are the documents you\'ll need:</p>', sumH + dcH);
+  setTimeout(function(){
+    addAI('<p>Click any document above to access it in the store — all attorney-reviewed and signed. What questions do you have?</p>',
+      suggs(['What do I do first after incorporating?','Explain the 83(b) election','How do I set up founder equity?','What\'s the difference between these entity types?']));
+  }, 1500);
+}
+
+function row(k, v) { return '<div class="sr"><span class="sk">'+k+'</span><span class="sv">'+v+'</span></div>'; }
+
+// ── FREE RESPONSES ──────────────────────────
+var QAB = {
+  '83b':   '<p>An <strong>83(b) election</strong> lets founders pay taxes on equity <em>now</em> at its current (low) value, rather than at each vesting event when it may be worth much more. You have <strong>30 days from the grant date</strong> to file — missing this window is one of the most expensive mistakes early founders make.</p>',
+  'llc':   '<p><strong>LLC:</strong> Flexible ownership, pass-through taxes, fewer formalities. Great for solo founders or small teams not raising VC.<br><br><strong>C-Corp:</strong> Taxed separately, but preferred by investors due to flexible equity structures (preferred stock, SAFEs, convertible notes). Delaware is the standard for VC-backed startups.</p>',
+  'vest':  '<p><strong>Founder vesting</strong> means co-founders earn equity over time. Standard: <strong>4-year vest, 1-year cliff</strong>. No equity vests months 1–11. At month 12, 25% vests all at once. Then monthly for 3 more years. This protects the company if a founder leaves early.</p>',
+  'board': '<p>C-Corps are legally required to have a board of directors — at formation it\'s usually just the founders. After seed funding, investors typically take a board seat. A <strong>Board Consent Resolution</strong> is the first document your board signs — it\'s part of your initial formation paperwork.</p>',
+  'def':   '<p>Great question. The right answer depends on your specific situation — entity type, state, team size, and whether you\'re raising capital. Let me know more context and I\'ll give a more specific answer, or use the guided flow to get a full recommendation.</p>',
+};
+
+function qaResp(t) {
+  var q = t.toLowerCase();
+  var ans = /83.?b/i.test(q) ? QAB['83b'] : /llc|c.?corp|s.?corp/i.test(q) ? QAB['llc'] : /vest/i.test(q) ? QAB['vest'] : /board/i.test(q) ? QAB['board'] : QAB['def'];
+  return { t:ans, s:['Tell me more','What document do I need for this?','Ask another question','Start the full incorporation flow'] };
+}
+
+function docsResp(t) {
+  var q = t.toLowerCase();
+  var n,d,b,e;
+  if(/nda|non.?disc|confid/i.test(q)){n='Mutual NDA';d='Standard bilateral non-disclosure';b='Privacy';e='An NDA prevents either party from sharing confidential information. A mutual NDA protects both sides — essential when sharing sensitive info with partners, vendors, or early hires.';}
+  else if(/vest|equity|co.?found/i.test(q)){n='Founder Vesting Agreement';d='4-year vest, 1-year cliff';b='Equity';e='A founder vesting agreement ensures co-founders earn equity over time. Standard: 4 years with a 1-year cliff — protecting the company if a founder leaves early.';}
+  else if(/ip|intellectual|patent|assign/i.test(q)){n='IP Assignment Agreement';d='Transfer pre-company IP to entity';b='IP';e='An IP Assignment transfers anything you created before incorporation — code, designs, inventions — to the company. Most investors require this before funding.';}
+  else if(/employ|contractor|hire/i.test(q)){n='Employment Agreement';d='Contractor and full-time employee terms';b='HR';e='Employment agreements define compensation, IP ownership, confidentiality, and termination. Misclassifying workers creates serious tax and legal liability.';}
+  else if(/bylaw|govern/i.test(q)){n='Corporate Bylaws';d='Board structure, voting, officer roles';b='C-Corp';e='Bylaws are the internal rules of a corporation — how the board operates, how decisions are made, and officer responsibilities. Required for all C-Corps.';}
+  else{n='LLC Operating Agreement';d='Single-member & multi-member versions';b='LLC';e='An Operating Agreement governs how your LLC runs — ownership, decision-making, profit distribution, and exit procedures. Even single-member LLCs benefit from one.';}
+  var card = '<div class="dcards"><a class="dcard" href="https://www.businessdocs.ca" target="_blank">'
+    +'<div class="di"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>'
+    +'<div style="flex:1"><div class="dn">'+n+'</div><div class="dd">'+d+'</div></div>'
+    +'<span class="db">'+b+'</span><div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></a></div>';
+  return { t:'<p>'+e+'</p><p>Here\'s the right document for you:</p>', x:card, s:['Do I need anything else?','What does this cover exactly?','Find another document','Start the full incorporation flow'] };
+}
+
+function strResp(t) {
+  var q = t.toLowerCase();
+  var rec,note;
+  if(/raise|invest|vc|seed|series/i.test(q)){rec='C-Corporation (Delaware)';note='If you\'re raising venture capital, a Delaware C-Corp is essentially required. Most institutional investors won\'t fund an LLC.';}
+  else if(/solo|just me|alone|one person/i.test(q)){rec='Single-Member LLC';note='For a solo founder not raising VC, a single-member LLC is ideal — liability protection, pass-through taxes, minimal overhead.';}
+  else if(/co.?found|partner|two|three/i.test(q)){rec='Multi-Member LLC or C-Corp';note='With co-founders you need a formal equity agreement regardless of entity. Bootstrapping: multi-member LLC. Raising VC: C-Corp with founder vesting from day one.';}
+  else if(/llc.*invest|convert/i.test(q)){rec='Convert LLC to C-Corp';note='LLCs can convert to C-Corps, but it\'s cleaner and cheaper to do it early — before investors, complex cap tables, or tax complications.';}
+  else{rec='Let\'s figure that out together';note='To give a specific recommendation I need more context. Are you solo or with co-founders? Planning to raise capital? Which state?';}
+  return { t:'<p><strong>My recommendation: '+rec+'</strong></p><p>'+note+'</p>', s:['What documents do I need?','Start the full guided flow','What are the tax implications?','Tell me more'] };
+}
+
+// ── SMART ROUTER ────────────────────────────
+// Determines which response function to use based on message content + context
+function routeResponse(text) {
+  var q = text.toLowerCase();
+  // Explicit flow already set by entry point — honor it
+  if (flow === 'docs')      return docsResp(text);
+  if (flow === 'structure') return strResp(text);
+
+  // For free-form / qa / post-onboarding, detect intent from message
+  if (/\b(nda|non.?disclosure|confidential|vesting agreement|operating agreement|bylaws|ip assignment|employment agreement|need.{1,20}(document|template|agreement|contract))\b/i.test(q)) {
+    return docsResp(text);
+  }
+  if (/\b(should i|what entity|llc or|c.?corp or|s.?corp or|set up|structure|co.?founder|raise|invest|incorporate.{1,20}as)\b/i.test(q) && !/explain|what is|how does|when do/i.test(q)) {
+    return strResp(text);
+  }
+  // Default to QA for explanations and general questions
+  return qaResp(text);
+}
+
+// ── SEND ────────────────────────────────────
+function send() {
+  var text = EL.ta.value.trim();
+  if (!text) return;
+  if (!inChat) { enterChat(); flow = 'free'; EL.ht.textContent = 'Chat'; }
+  EL.hb.style.display = 'inline-block';
+  addUser(text);
+  EL.ta.value = ''; EL.ta.style.height = 'auto';
+  turn++;
+
+  if (/start.*(flow|incorporation|onboard)|full.*flow|incorporate.*now|begin.*onboard/i.test(text)) {
+    typeThen(400, function(){ startFlow('onboard'); }); return;
+  }
+
+  addTyping();
+  var delay = 900 + Math.random()*400;
+  setTimeout(function(){
+    var r = routeResponse(text);
+    rmTyping();
+    addAI(r.t, (r.x||'') + (r.s ? suggs(r.s) : ''));
+  }, delay);
+}
+
+// ── SUGGESTION CHIPS ────────────────────────
+function suggs(list) {
+  return '<div class="suggs">' + list.map(function(s){
+    return '<button class="sugg" onclick="clickSugg(this)">' + s + '</button>';
+  }).join('') + '</div>';
+}
+
+function clickSugg(b) {
+  b.parentElement.querySelectorAll('.sugg').forEach(function(x){ x.disabled=true; });
+  var t = b.textContent.trim();
+  // For "start full flow" suggestions, just kick off the flow directly — startFlow shows its own intro message
+  if (/start.*(full|flow|incorporation flow|guided flow)/i.test(t)) {
+    startFlow('onboard');
+  } else {
+    EL.ta.value = t;
+    send();
+  }
+}
+
+// ── DOM HELPERS ─────────────────────────────
+var AVG_SVG = '<svg viewBox="0 0 16 16"><path d="M8 2L8 14M4 5L8 2L12 5"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="4" y1="11" x2="12" y2="11"/></svg>';
+
+function addUser(t) {
+  var r = document.createElement('div'); r.className = 'mr';
+  r.innerHTML = '<div class="ur"><div class="ub">'+esc(t)+'</div></div>';
+  EL.msgs.appendChild(r); scrollB();
+}
+
+function addAI(html, extras) {
+  rmTyping();
+  var r = document.createElement('div'); r.className = 'mr';
+  r.innerHTML = '<div class="ar"><div class="a-av">'+AVG_SVG+'</div><div class="a-con"><div class="a-name">LEXAI</div><div class="a-text">'+html+'</div>'+(extras||'')+'</div></div>';
+  EL.msgs.appendChild(r); scrollB();
+}
+
+function addTyping() {
+  rmTyping();
+  var r = document.createElement('div'); r.className = 'mr'; r.id = 'typ';
+  r.innerHTML = '<div class="ar"><div class="a-av">'+AVG_SVG+'</div><div class="a-con"><div class="tdots"><div class="td"></div><div class="td"></div><div class="td"></div></div></div></div>';
+  EL.msgs.appendChild(r); scrollB();
+}
+
+function rmTyping(){ var t=document.getElementById('typ'); if(t) t.remove(); }
+function typeThen(ms, fn){ addTyping(); setTimeout(fn, ms); }
+function scrollB(){ setTimeout(function(){ EL.msgs.scrollTop = EL.msgs.scrollHeight; }, 50); }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function newChat(){ showWelcome(); }
+
+// ── INPUT EVENTS ────────────────────────────
+EL.ta.addEventListener('keydown', function(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
+EL.ta.addEventListener('input', function(){ EL.ta.style.height='auto'; EL.ta.style.height=Math.min(EL.ta.scrollHeight,150)+'px'; });
+
+// ── INIT ────────────────────────────────────
+showWelcome();
+</script>
+
+<!-- ═══════════════════════════════════
+     SUPABASE AUTH — SESSION + LOGOUT
+═══════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://ujvnguphvlmuqcwrrsdz.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqdm5ndXBodmxtdXFjd3Jyc2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTI1OTYsImV4cCI6MjA5MjI4ODU5Nn0.6uQkFiVE6B3tTTQWhloJbtLJE5s1Qu5vrDITmsl3KJk';
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function initAuth() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      // Not logged in — hide user menu, show generic avatar
+      document.getElementById('avatarBtn').textContent = '?';
+      document.getElementById('avatarBtn').title = 'Sign in';
+      document.getElementById('avatarBtn').onclick = function() { window.location.href = 'lexai.html'; };
+      document.getElementById('userMenu').remove();
+      // Keep sidebar user as generic
+      var sbUser = document.querySelector('.sb-user');
+      if (sbUser) {
+        sbUser.querySelector('.sb-av').textContent = '?';
+        sbUser.querySelector('.sb-name').textContent = 'Guest';
+        sbUser.querySelector('.sb-plan').textContent = 'Sign in to save progress';
+        sbUser.style.cursor = 'pointer';
+        sbUser.onclick = function() { window.location.href = 'lexai.html'; };
+      }
+      return;
+    }
+    // Logged in — populate avatar + menu with user info
+    const email = session.user.email || '';
+    const initials = (email[0] || 'U').toUpperCase() + (email.split('@')[0][1] || '').toUpperCase();
+    document.getElementById('avatarBtn').textContent = initials;
+    document.getElementById('userMenuEmail').textContent = email;
+
+    const sbUser = document.querySelector('.sb-user');
+    if (sbUser) {
+      sbUser.querySelector('.sb-av').textContent = initials;
+      sbUser.querySelector('.sb-name').textContent = email.split('@')[0];
+      sbUser.querySelector('.sb-plan').textContent = email;
+    }
+  }
+
+  function toggleUserMenu() {
+    const menu = document.getElementById('userMenu');
+    if (!menu) return;
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Close menu when clicking outside
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('userMenu');
+    const btn = document.getElementById('avatarBtn');
+    if (menu && menu.style.display === 'block' && !menu.contains(e.target) && e.target !== btn) {
+      menu.style.display = 'none';
+    }
+  });
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'lexai.html';
+  }
+
+  // Listen for sign-out events from other tabs
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' && !session) {
+      window.location.href = 'lexai.html';
+    }
+  });
+
+  initAuth();
+</script>
+</body>
+</html>
