@@ -1350,6 +1350,18 @@
 ══════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Fallback loader: if primary CDN didn't set window.supabase, try alternative
+  window.addEventListener('load', function() {
+    if (typeof window.supabase === 'undefined') {
+      console.warn('Primary Supabase CDN failed, trying fallback...');
+      var fallback = document.createElement('script');
+      fallback.src = 'https://unpkg.com/@supabase/supabase-js@2';
+      fallback.onload = function() { if (window.initSupabaseAuth) window.initSupabaseAuth(); };
+      document.head.appendChild(fallback);
+    }
+  });
+</script>
+<script>
   // Define functions on window FIRST so onclick handlers always find them,
   // even if Supabase fails to load or throws errors.
   var supabase = null;
@@ -1489,16 +1501,19 @@
   });
 
   // Initialize Supabase (do this last so function definitions are available first)
-  try {
-    if (window.supabase && window.supabase.createClient) {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      checkSession();
-    } else {
-      console.warn('Supabase SDK failed to load. Auth features will be unavailable.');
+  window.initSupabaseAuth = function() {
+    try {
+      if (window.supabase && window.supabase.createClient) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        checkSession();
+      } else {
+        console.warn('Supabase SDK not available yet. Will retry on fallback load.');
+      }
+    } catch (e) {
+      console.error('Supabase initialization error:', e);
     }
-  } catch (e) {
-    console.error('Supabase initialization error:', e);
-  }
+  };
+  window.initSupabaseAuth();
 </script>
 
 </body>

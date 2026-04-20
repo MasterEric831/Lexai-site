@@ -624,6 +624,17 @@ showWelcome();
 ═══════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  window.addEventListener('load', function() {
+    if (typeof window.supabase === 'undefined') {
+      console.warn('Primary Supabase CDN failed, trying fallback...');
+      var fallback = document.createElement('script');
+      fallback.src = 'https://unpkg.com/@supabase/supabase-js@2';
+      fallback.onload = function() { if (window.initChatAuth) window.initChatAuth(); };
+      document.head.appendChild(fallback);
+    }
+  });
+</script>
+<script>
   const SUPABASE_URL = 'https://ujvnguphvlmuqcwrrsdz.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqdm5ndXBodmxtdXFjd3Jyc2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTI1OTYsImV4cCI6MjA5MjI4ODU5Nn0.6uQkFiVE6B3tTTQWhloJbtLJE5s1Qu5vrDITmsl3KJk';
 
@@ -690,20 +701,24 @@ showWelcome();
   });
 
   // Initialize Supabase
-  try {
-    if (window.supabase && window.supabase.createClient) {
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      sb.auth.onAuthStateChange(function(event, session) {
-        if (event === 'SIGNED_OUT' && !session) window.location.href = '/';
-      });
-    } else {
-      console.warn('Supabase SDK failed to load. Running in guest mode.');
+  window.initChatAuth = function() {
+    try {
+      if (window.supabase && window.supabase.createClient) {
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        sb.auth.onAuthStateChange(function(event, session) {
+          if (event === 'SIGNED_OUT' && !session) window.location.href = '/';
+        });
+        initAuth();
+      } else {
+        console.warn('Supabase SDK not available. Running in guest mode.');
+        initAuth();
+      }
+    } catch (e) {
+      console.error('Supabase init error:', e);
+      initAuth();
     }
-  } catch (e) {
-    console.error('Supabase init error:', e);
-  }
-
-  initAuth();
+  };
+  window.initChatAuth();
 </script>
 </body>
 </html>
