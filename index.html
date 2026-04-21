@@ -1350,21 +1350,9 @@
 ══════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Fallback loader: if primary CDN didn't set window.supabase, try alternative
-  window.addEventListener('load', function() {
-    if (typeof window.supabase === 'undefined') {
-      console.warn('Primary Supabase CDN failed, trying fallback...');
-      var fallback = document.createElement('script');
-      fallback.src = 'https://unpkg.com/@supabase/supabase-js@2';
-      fallback.onload = function() { if (window.initSupabaseAuth) window.initSupabaseAuth(); };
-      document.head.appendChild(fallback);
-    }
-  });
-</script>
-<script>
   // Define functions on window FIRST so onclick handlers always find them,
   // even if Supabase fails to load or throws errors.
-  var supabase = null;
+  var sbClient = null; // renamed to avoid collision with window.supabase global
   var authMode = 'signin';
   const SUPABASE_URL = 'https://ujvnguphvlmuqcwrrsdz.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqdm5ndXBodmxtdXFjd3Jyc2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTI1OTYsImV4cCI6MjA5MjI4ODU5Nn0.6uQkFiVE6B3tTTQWhloJbtLJE5s1Qu5vrDITmsl3KJk';
@@ -1415,7 +1403,7 @@
   window.handleAuthSubmit = async function(e) {
     e.preventDefault();
     clearAuthMsg();
-    if (!supabase) { showAuthMsg('Authentication service unavailable. Please refresh the page.', 'error'); return; }
+    if (!sbClient) { showAuthMsg('Authentication service unavailable. Please refresh the page.', 'error'); return; }
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
     const btn = document.getElementById('authSubmitBtn');
@@ -1424,7 +1412,7 @@
 
     try {
       if (authMode === 'signup') {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await sbClient.auth.signUp({
           email, password,
           options: { emailRedirectTo: window.location.origin + '/lexai-chat.html' }
         });
@@ -1438,7 +1426,7 @@
           btn.textContent = 'Create account';
         }
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
         showAuthMsg('Signed in! Redirecting...', 'success');
         setTimeout(() => window.location.href = 'lexai-chat.html', 600);
@@ -1456,7 +1444,7 @@
 
   // ── GOOGLE OAUTH ──────────────────────────────
   window.signInWithGoogle = async function() {
-    if (!supabase) {
+    if (!sbClient) {
       alert('Authentication service is still loading. Please wait a moment and try again.');
       return;
     }
@@ -1464,7 +1452,7 @@
       clearAuthMsg();
     }
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await sbClient.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: window.location.origin + '/lexai-chat.html' }
       });
@@ -1481,9 +1469,9 @@
 
   // ── SESSION CHECK ─────────────────────────────
   async function checkSession() {
-    if (!supabase) return;
+    if (!sbClient) return;
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await sbClient.auth.getSession();
       if (session) {
         document.querySelectorAll('button').forEach(btn => {
           if (btn.textContent.trim() === 'Sign in') {
@@ -1500,20 +1488,27 @@
     if (e.key === 'Escape' && typeof closeAuth === 'function') closeAuth();
   });
 
-  // Initialize Supabase (do this last so function definitions are available first)
-  window.initSupabaseAuth = function() {
-    try {
-      if (window.supabase && window.supabase.createClient) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Initialize Supabase with retry polling
+  // The CDN script may load AFTER this script block executes, so we poll.
+  var sbInitAttempts = 0;
+  function trySupabaseInit() {
+    sbInitAttempts++;
+    if (window.supabase && window.supabase.createClient) {
+      try {
+        sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✓ Supabase initialized successfully');
         checkSession();
-      } else {
-        console.warn('Supabase SDK not available yet. Will retry on fallback load.');
+      } catch (e) {
+        console.error('Supabase createClient error:', e);
       }
-    } catch (e) {
-      console.error('Supabase initialization error:', e);
+    } else if (sbInitAttempts < 50) {
+      // Retry every 100ms for up to 5 seconds
+      setTimeout(trySupabaseInit, 100);
+    } else {
+      console.error('Supabase SDK never loaded after 5 seconds. Check network/CDN.');
     }
-  };
-  window.initSupabaseAuth();
+  }
+  trySupabaseInit();
 </script>
 
 </body>

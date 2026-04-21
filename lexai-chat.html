@@ -624,17 +624,6 @@ showWelcome();
 ═══════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  window.addEventListener('load', function() {
-    if (typeof window.supabase === 'undefined') {
-      console.warn('Primary Supabase CDN failed, trying fallback...');
-      var fallback = document.createElement('script');
-      fallback.src = 'https://unpkg.com/@supabase/supabase-js@2';
-      fallback.onload = function() { if (window.initChatAuth) window.initChatAuth(); };
-      document.head.appendChild(fallback);
-    }
-  });
-</script>
-<script>
   const SUPABASE_URL = 'https://ujvnguphvlmuqcwrrsdz.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqdm5ndXBodmxtdXFjd3Jyc2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTI1OTYsImV4cCI6MjA5MjI4ODU5Nn0.6uQkFiVE6B3tTTQWhloJbtLJE5s1Qu5vrDITmsl3KJk';
 
@@ -700,25 +689,30 @@ showWelcome();
     }
   });
 
-  // Initialize Supabase
-  window.initChatAuth = function() {
-    try {
-      if (window.supabase && window.supabase.createClient) {
+  // Initialize Supabase with retry polling
+  var sbInitAttempts = 0;
+  function trySupabaseInit() {
+    sbInitAttempts++;
+    if (window.supabase && window.supabase.createClient) {
+      try {
         sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         sb.auth.onAuthStateChange(function(event, session) {
           if (event === 'SIGNED_OUT' && !session) window.location.href = '/';
         });
+        console.log('✓ Supabase initialized successfully');
         initAuth();
-      } else {
-        console.warn('Supabase SDK not available. Running in guest mode.');
+      } catch (e) {
+        console.error('Supabase createClient error:', e);
         initAuth();
       }
-    } catch (e) {
-      console.error('Supabase init error:', e);
+    } else if (sbInitAttempts < 50) {
+      setTimeout(trySupabaseInit, 100);
+    } else {
+      console.error('Supabase SDK never loaded. Running in guest mode.');
       initAuth();
     }
-  };
-  window.initChatAuth();
+  }
+  trySupabaseInit();
 </script>
 </body>
 </html>
