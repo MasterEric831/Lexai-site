@@ -49,9 +49,15 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(-
 .sb-item svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; }
 .sb-div { height: 1px; background: var(--ink10); margin: 0.5rem 0.75rem; }
 .sb-hist { flex: 1; overflow-y: auto; padding: 0 0.75rem 1rem; }
-.sb-hi { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px; font-size: 12px; color: var(--ink60); cursor: pointer; transition: background 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-hi { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px; font-size: 12px; color: var(--ink60); cursor: pointer; transition: background 0.15s; position: relative; }
 .sb-hi:hover { background: var(--cream); color: var(--ink); }
-.sb-hi svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; opacity: 0.4; }
+.sb-hi.active { background: var(--cream); color: var(--ink); font-weight: 500; }
+.sb-hi svg.chat-icon { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; flex-shrink: 0; opacity: 0.4; }
+.sb-hi-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-hi-del { opacity: 0; width: 18px; height: 18px; border: none; background: transparent; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ink60); transition: opacity 0.15s, background 0.15s; }
+.sb-hi:hover .sb-hi-del { opacity: 1; }
+.sb-hi-del:hover { background: rgba(26,24,20,0.1); color: var(--ink); }
+.sb-hi-del svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 1.5; }
 .sb-foot { padding: 0.75rem; border-top: 1px solid var(--ink10); }
 .sb-user { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
 .sb-user:hover { background: var(--cream); }
@@ -218,11 +224,8 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(-
     </div>
     <div class="sb-div"></div>
     <div class="sb-sec"><div class="sb-lbl">Recent</div></div>
-    <div class="sb-hist">
-      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>Delaware C-Corp setup</div>
-      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>Founder equity split</div>
-      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>LLC vs S-Corp</div>
-      <div class="sb-hi" onclick="newChat()"><svg viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>83(b) election timing</div>
+    <div class="sb-hist" id="sbHist">
+      <div class="sb-empty" id="sbEmpty" style="padding:10px;font-size:11px;color:var(--ink30);font-style:italic;">No conversations yet</div>
     </div>
     <div class="sb-foot">
       <div class="sb-user">
@@ -259,6 +262,13 @@ var flow = 'none';
 var obStep = 0;
 var obAns = {};
 var turn = 0;
+
+// ── CHAT PERSISTENCE STATE ─────────────────
+var currentChatId = null;    // UUID of the current saved chat (null = not saved yet)
+var chatMessages = [];       // array of {role: 'user'|'ai', content: string} tracked for saving
+var chatTitle = 'New chat';
+var saveTimeout = null;      // debounced save handle
+var sidebarHist = [];        // cached list of chats for sidebar
 
 // ── DOM ────────────────────────────────────
 var EL = {
@@ -298,6 +308,15 @@ var OB = [
 // ── WELCOME ─────────────────────────────────
 function showWelcome() {
   inChat = false; flow = 'none'; obStep = 0; obAns = {}; turn = 0;
+  // Reset chat persistence state for a fresh conversation
+  currentChatId = null;
+  chatMessages = [];
+  chatTitle = 'New chat';
+  if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
+  // Clear any "active" indicator from sidebar
+  var actives = document.querySelectorAll('.sb-hi.active');
+  actives.forEach(function(el) { el.classList.remove('active'); });
+
   EL.msgs.className = 'messages wmode';
   EL.msgs.innerHTML = '';
   EL.ht.textContent = 'New conversation';
@@ -333,7 +352,6 @@ function btn(cls, onclick, svgPath, label) {
 
 // ── ENTER CHAT MODE ─────────────────────────
 function enterChat() {
-  if (inChat) return;
   inChat = true;
   EL.msgs.className = 'messages cmode';
   EL.msgs.innerHTML = '';
@@ -589,6 +607,10 @@ function addUser(t) {
   var r = document.createElement('div'); r.className = 'mr';
   r.innerHTML = '<div class="ur"><div class="ub">'+esc(t)+'</div></div>';
   EL.msgs.appendChild(r); scrollB();
+  // Track for persistence
+  chatMessages.push({role: 'user', content: t});
+  if (chatMessages.length === 1) chatTitle = makeChatTitle(t); // Use first user message as title
+  scheduleSave();
 }
 
 function addAI(html, extras) {
@@ -596,6 +618,14 @@ function addAI(html, extras) {
   var r = document.createElement('div'); r.className = 'mr';
   r.innerHTML = '<div class="ar"><div class="a-av">'+AVG_SVG+'</div><div class="a-con"><div class="a-name">LEXAI</div><div class="a-text">'+html+'</div>'+(extras||'')+'</div></div>';
   EL.msgs.appendChild(r); scrollB();
+  // Track for persistence (store raw HTML so we can restore it)
+  chatMessages.push({role: 'ai', content: html, extras: extras || ''});
+  scheduleSave();
+}
+
+function makeChatTitle(firstMsg) {
+  var clean = firstMsg.replace(/\s+/g, ' ').trim();
+  return clean.length > 40 ? clean.slice(0, 40).trim() + '...' : clean;
 }
 
 function addTyping() {
@@ -610,6 +640,144 @@ function typeThen(ms, fn){ addTyping(); setTimeout(fn, ms); }
 function scrollB(){ setTimeout(function(){ EL.msgs.scrollTop = EL.msgs.scrollHeight; }, 50); }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function newChat(){ showWelcome(); }
+
+// ── CHAT PERSISTENCE ────────────────────────
+// Debounced save - waits 800ms after last change to batch writes
+function scheduleSave() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(saveChat, 800);
+}
+
+async function saveChat() {
+  saveTimeout = null;
+  if (!window.sb || chatMessages.length === 0) return;
+  try {
+    var session = await window.sb.auth.getSession();
+    if (!session.data.session) return; // guest mode, skip
+    var userId = session.data.session.user.id;
+
+    if (!currentChatId) {
+      // Insert new chat
+      var res = await window.sb.from('chats').insert({
+        user_id: userId,
+        title: chatTitle,
+        messages: chatMessages,
+        flow: flow
+      }).select('id').single();
+      if (res.error) { console.error('Save error:', res.error); return; }
+      currentChatId = res.data.id;
+    } else {
+      // Update existing
+      var res = await window.sb.from('chats').update({
+        title: chatTitle,
+        messages: chatMessages,
+        flow: flow
+      }).eq('id', currentChatId);
+      if (res.error) { console.error('Update error:', res.error); return; }
+    }
+    loadHistory(); // refresh sidebar to show this chat / update title
+  } catch (e) {
+    console.error('saveChat error:', e);
+  }
+}
+
+async function loadHistory() {
+  if (!window.sb) return;
+  try {
+    var session = await window.sb.auth.getSession();
+    if (!session.data.session) {
+      // Guest mode - show empty state
+      var hist = document.getElementById('sbHist');
+      if (hist) hist.innerHTML = '<div class="sb-empty" style="padding:10px;font-size:11px;color:var(--ink30);font-style:italic;">Sign in to save chats</div>';
+      return;
+    }
+    var res = await window.sb.from('chats')
+      .select('id, title, updated_at')
+      .order('updated_at', { ascending: false })
+      .limit(30);
+    if (res.error) { console.error('Load history error:', res.error); return; }
+    renderHistory(res.data || []);
+  } catch (e) {
+    console.error('loadHistory error:', e);
+  }
+}
+
+function renderHistory(chats) {
+  var hist = document.getElementById('sbHist');
+  if (!hist) return;
+  sidebarHist = chats;
+  if (chats.length === 0) {
+    hist.innerHTML = '<div class="sb-empty" style="padding:10px;font-size:11px;color:var(--ink30);font-style:italic;">No conversations yet</div>';
+    return;
+  }
+  var html = '';
+  chats.forEach(function(c) {
+    var active = c.id === currentChatId ? ' active' : '';
+    html += '<div class="sb-hi' + active + '" data-id="' + c.id + '" onclick="openChat(\'' + c.id + '\')">'
+      + '<svg class="chat-icon" viewBox="0 0 12 12"><path d="M1 9Q1 11 3 11H9Q11 11 11 9V5Q11 3 9 3H7L5 1H3Q1 1 1 3Z"/></svg>'
+      + '<span class="sb-hi-text">' + esc(c.title) + '</span>'
+      + '<button class="sb-hi-del" onclick="event.stopPropagation();deleteChat(\'' + c.id + '\')" title="Delete chat">'
+      + '<svg viewBox="0 0 12 12"><polyline points="2,3 10,3"/><path d="M4 3V2a1 1 0 011-1h2a1 1 0 011 1v1"/><path d="M3 3l1 7a1 1 0 001 1h2a1 1 0 001-1l1-7"/></svg>'
+      + '</button></div>';
+  });
+  hist.innerHTML = html;
+}
+
+async function openChat(chatId) {
+  if (!window.sb || chatId === currentChatId) return;
+  try {
+    var res = await window.sb.from('chats').select('*').eq('id', chatId).single();
+    if (res.error) { console.error('Open error:', res.error); return; }
+    var chat = res.data;
+
+    // Reset and enter chat mode with this chat's data
+    if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
+    currentChatId = chat.id;
+    chatMessages = chat.messages || [];
+    chatTitle = chat.title;
+    flow = chat.flow || 'free';
+    inChat = true;
+    obStep = 0; obAns = {}; turn = 0;
+
+    EL.msgs.className = 'messages cmode';
+    EL.msgs.innerHTML = '';
+    EL.ht.textContent = chat.title;
+    EL.hb.style.display = 'inline-block';
+    EL.pg.className = 'pg'; // hide progress bar for loaded chats
+    EL.an.className = 'an';
+
+    // Replay messages into the DOM without re-saving
+    chatMessages.forEach(function(m) {
+      var r = document.createElement('div'); r.className = 'mr';
+      if (m.role === 'user') {
+        r.innerHTML = '<div class="ur"><div class="ub">' + esc(m.content) + '</div></div>';
+      } else {
+        r.innerHTML = '<div class="ar"><div class="a-av">' + AVG_SVG + '</div><div class="a-con"><div class="a-name">LEXAI</div><div class="a-text">' + m.content + '</div>' + (m.extras || '') + '</div></div>';
+      }
+      EL.msgs.appendChild(r);
+    });
+    scrollB();
+    loadHistory(); // refresh active state in sidebar
+  } catch (e) {
+    console.error('openChat error:', e);
+  }
+}
+
+async function deleteChat(chatId) {
+  if (!window.sb) return;
+  if (!confirm('Delete this chat? This cannot be undone.')) return;
+  try {
+    var res = await window.sb.from('chats').delete().eq('id', chatId);
+    if (res.error) { console.error('Delete error:', res.error); return; }
+    if (chatId === currentChatId) {
+      // We deleted the currently open chat - reset to welcome
+      showWelcome();
+    }
+    loadHistory();
+  } catch (e) {
+    console.error('deleteChat error:', e);
+  }
+}
 
 // ── INPUT EVENTS ────────────────────────────
 EL.ta.addEventListener('keydown', function(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
@@ -696,11 +864,13 @@ showWelcome();
     if (window.supabase && window.supabase.createClient) {
       try {
         sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.sb = sb; // Expose globally so chat persistence functions can use it
         sb.auth.onAuthStateChange(function(event, session) {
           if (event === 'SIGNED_OUT' && !session) window.location.href = '/';
         });
         console.log('✓ Supabase initialized successfully');
         initAuth();
+        if (typeof loadHistory === 'function') loadHistory(); // load chat list
       } catch (e) {
         console.error('Supabase createClient error:', e);
         initAuth();
