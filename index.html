@@ -996,7 +996,7 @@
             <span><strong style="color:var(--cream)">In-house attorney review</strong> &amp; sign-off on all documents</span>
           </li>
         </ul>
-        <button class="plan-cta" onclick="window.location.href='lexai-chat.html'">Start 14-day free trial</button>
+        <button class="plan-cta" onclick="handleFounderUpgrade()">Upgrade to Founder — $49/mo</button>
       </div>
       <div class="plan fade-in" style="transition-delay:0.2s">
         <div class="plan-tier">Law Firm</div>
@@ -1010,7 +1010,7 @@
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> API access & integrations</li>
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Dedicated account manager</li>
         </ul>
-        <button class="plan-cta">Talk to us</button>
+        <button class="plan-cta" onclick="window.location.href='mailto:eric.jakubov@gmail.com?subject=LexAI Law Firm Inquiry'">Talk to us</button>
       </div>
     </div>
   </div>
@@ -1472,14 +1472,35 @@
     if (!sbClient) return;
     try {
       const { data: { session } } = await sbClient.auth.getSession();
-      if (session) {
-        document.querySelectorAll('button').forEach(btn => {
-          if (btn.textContent.trim() === 'Sign in') {
-            btn.textContent = 'Open chat';
-            btn.onclick = () => window.location.href = 'lexai-chat.html';
-          }
-        });
-      }
+      if (!session) return;
+
+      // Swap Sign in button → Open chat
+      document.querySelectorAll('button').forEach(btn => {
+        if (btn.textContent.trim() === 'Sign in') {
+          btn.textContent = 'Open chat';
+          btn.onclick = () => window.location.href = 'lexai-chat.html';
+        }
+      });
+
+      // Check subscription status — if already Founder, pricing CTA should just open chat
+      try {
+        const subRes = await sbClient
+          .from('subscriptions')
+          .select('plan, status')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (subRes.data && (subRes.data.plan === 'founder' || subRes.data.plan === 'law_firm')
+            && (subRes.data.status === 'active' || subRes.data.status === 'trialing')) {
+          document.querySelectorAll('button').forEach(btn => {
+            const t = btn.textContent.trim();
+            if (/upgrade to founder/i.test(t) || /start.*trial/i.test(t)) {
+              btn.textContent = 'Open chat';
+              btn.onclick = () => window.location.href = 'lexai-chat.html';
+            }
+          });
+        }
+      } catch (subErr) { /* noop - no subscription row yet */ }
     } catch (e) { /* noop */ }
   }
 
@@ -1487,6 +1508,41 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && typeof closeAuth === 'function') closeAuth();
   });
+
+  // ── CHECKOUT (FOUNDER UPGRADE) ────────────────
+  window.handleFounderUpgrade = async function() {
+    // If Supabase isn't ready yet, just open the auth modal
+    if (!sbClient) {
+      openAuth('signup');
+      return;
+    }
+    try {
+      const { data: { session } } = await sbClient.auth.getSession();
+      if (!session) {
+        // Not logged in — open auth modal first
+        openAuth('signup');
+        return;
+      }
+      // Logged in — start Stripe checkout
+      const res = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+        },
+        body: JSON.stringify({ plan: 'founder' }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Could not start checkout: ' + (data.error || 'unknown error'));
+      }
+    } catch (e) {
+      console.error('Upgrade error:', e);
+      alert('Could not start checkout. Please try again.');
+    }
+  };
 
   // Initialize Supabase with retry polling
   // The CDN script may load AFTER this script block executes, so we poll.

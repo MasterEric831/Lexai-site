@@ -255,6 +255,66 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(-
   </main>
 </div>
 
+<!-- ═══════════════════════════════════
+     PAYWALL MODAL
+═══════════════════════════════════ -->
+<style>
+  .pw-overlay { display:none; position:fixed; inset:0; z-index:1000; background:rgba(26,24,20,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:1rem; }
+  .pw-overlay.open { display:flex; }
+  .pw-modal { width:100%; max-width:460px; background:var(--cream); border:1px solid var(--ink10); border-radius:14px; padding:2rem 1.75rem; position:relative; box-shadow:0 20px 60px rgba(26,24,20,0.25); }
+  .pw-close { position:absolute; top:14px; right:14px; width:28px; height:28px; border-radius:6px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--ink30); }
+  .pw-close:hover { background:var(--ink10); color:var(--ink); }
+  .pw-icon { width:48px; height:48px; background:var(--gold-bg); border:1px solid rgba(184,151,74,0.3); border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem; }
+  .pw-icon svg { width:22px; height:22px; stroke:var(--gold); fill:none; stroke-width:1.5; }
+  .pw-title { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:500; margin-bottom:4px; }
+  .pw-title em { font-style:italic; }
+  .pw-sub { font-size:13px; color:var(--ink60); margin-bottom:1.5rem; line-height:1.6; }
+  .pw-features { list-style:none; padding:0; margin:0 0 1.5rem; }
+  .pw-features li { display:flex; align-items:flex-start; gap:9px; padding:6px 0; font-size:13px; color:var(--ink); }
+  .pw-features li svg { width:14px; height:14px; color:var(--green); flex-shrink:0; margin-top:3px; }
+  .pw-price { font-size:13px; color:var(--ink60); margin-bottom:1rem; }
+  .pw-price strong { font-size:22px; color:var(--ink); font-weight:500; }
+  .pw-btn { width:100%; padding:12px; background:var(--ink); color:var(--cream); border:none; border-radius:8px; font-family:'Geist',sans-serif; font-size:14px; font-weight:500; cursor:pointer; margin-bottom:8px; }
+  .pw-btn:hover { opacity:0.85; }
+  .pw-btn:disabled { opacity:0.5; cursor:wait; }
+  .pw-btn-secondary { width:100%; padding:10px; background:transparent; color:var(--ink60); border:1px solid var(--ink20); border-radius:8px; font-family:'Geist',sans-serif; font-size:12px; cursor:pointer; }
+  .pw-btn-secondary:hover { background:var(--ink06); }
+
+  /* Plan badge in header */
+  .h-plan-badge { font-size:10px; font-weight:500; padding:2px 8px; border-radius:10px; background:var(--gold-bg); color:var(--gold); border:1px solid rgba(184,151,74,0.3); margin-right:8px; }
+  .h-plan-badge.founder { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+  .h-plan-badge.law_firm { background:#8C1C13; color:#fff; border-color:#8C1C13; }
+  .h-usage { font-size:11px; color:var(--ink60); margin-right:8px; }
+
+  /* Document card locked state */
+  .dcard.locked { position:relative; cursor:pointer; opacity:0.85; }
+  .dcard.locked::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent 50%, rgba(248,245,239,0.92) 100%); pointer-events:none; border-radius:9px; }
+  .dcard-lock-badge { background:var(--ink); color:var(--cream); border-color:var(--ink); display:flex; align-items:center; gap:4px; }
+  .dcard-lock-badge svg { width:10px; height:10px; stroke:currentColor; fill:none; stroke-width:1.8; }
+</style>
+
+<div class="pw-overlay" id="pwOverlay" onclick="if(event.target===this) closePaywall()">
+  <div class="pw-modal">
+    <button class="pw-close" onclick="closePaywall()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="3" y1="3" x2="11" y2="11"/><line x1="11" y1="3" x2="3" y2="11"/></svg>
+    </button>
+    <div class="pw-icon">
+      <svg viewBox="0 0 22 22"><rect x="5" y="10" width="12" height="9" rx="1.5"/><path d="M7 10V7a4 4 0 018 0v3"/></svg>
+    </div>
+    <h2 class="pw-title" id="pwTitle">Upgrade to <em>Founder</em></h2>
+    <p class="pw-sub" id="pwSub">You've used all 20 of your free questions this month. Upgrade to keep the conversation going and unlock every document.</p>
+    <ul class="pw-features">
+      <li><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,7 6,10 11,4"/></svg>Unlimited AI conversations</li>
+      <li><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,7 6,10 11,4"/></svg>Full access to all 180+ attorney-reviewed documents</li>
+      <li><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,7 6,10 11,4"/></svg>Priority attorney review on custom documents</li>
+      <li><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,7 6,10 11,4"/></svg>Cancel anytime</li>
+    </ul>
+    <p class="pw-price"><strong>$49</strong> / month</p>
+    <button class="pw-btn" id="pwUpgradeBtn" onclick="startCheckout('founder')">Upgrade to Founder</button>
+    <button class="pw-btn-secondary" onclick="closePaywall()">Maybe later</button>
+  </div>
+</div>
+
 <script>
 // ── STATE ──────────────────────────────────
 var inChat = false;
@@ -269,6 +329,11 @@ var chatMessages = [];       // array of {role: 'user'|'ai', content: string} tr
 var chatTitle = 'New chat';
 var saveTimeout = null;      // debounced save handle
 var sidebarHist = [];        // cached list of chats for sidebar
+
+// ── SUBSCRIPTION + USAGE STATE ─────────────
+var userPlan = 'free';           // 'free' | 'founder' | 'law_firm' | 'guest'
+var usageCount = 0;              // questions asked this month
+var USAGE_LIMIT_FREE = 20;       // monthly question limit for free tier
 
 // ── DOM ────────────────────────────────────
 var EL = {
@@ -477,10 +542,7 @@ function showRecs() {
     + row('State', obAns.state||'—') + '<div class="sr"><span class="sk">Entity</span><span class="sv">' + rec + ' <span class="stag">Best fit</span></span></div></div>';
 
   var dcH = '<div class="dcards">' + docs.map(function(d){
-    return '<a class="dcard" href="https://www.businessdocs.ca" target="_blank">'
-      +'<div class="di"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>'
-      +'<div style="flex:1"><div class="dn">'+d.n+'</div><div class="dd">'+d.d+'</div></div>'
-      +'<span class="db">'+d.b+'</span><div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></a>';
+    return buildDocCard(d.n, d.d, d.b);
   }).join('') + '</div>';
 
   EL.ht.textContent = 'Incorporation plan ready';
@@ -521,10 +583,7 @@ function docsResp(t) {
   else if(/employ|contractor|hire/i.test(q)){n='Employment Agreement';d='Contractor and full-time employee terms';b='HR';e='Employment agreements define compensation, IP ownership, confidentiality, and termination. Misclassifying workers creates serious tax and legal liability.';}
   else if(/bylaw|govern/i.test(q)){n='Corporate Bylaws';d='Board structure, voting, officer roles';b='C-Corp';e='Bylaws are the internal rules of a corporation — how the board operates, how decisions are made, and officer responsibilities. Required for all C-Corps.';}
   else{n='LLC Operating Agreement';d='Single-member & multi-member versions';b='LLC';e='An Operating Agreement governs how your LLC runs — ownership, decision-making, profit distribution, and exit procedures. Even single-member LLCs benefit from one.';}
-  var card = '<div class="dcards"><a class="dcard" href="https://www.businessdocs.ca" target="_blank">'
-    +'<div class="di"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>'
-    +'<div style="flex:1"><div class="dn">'+n+'</div><div class="dd">'+d+'</div></div>'
-    +'<span class="db">'+b+'</span><div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></a></div>';
+  var card = '<div class="dcards">' + buildDocCard(n, d, b) + '</div>';
   return { t:'<p>'+e+'</p><p>Here\'s the right document for you:</p>', x:card, s:['Do I need anything else?','What does this cover exactly?','Find another document','Start the full incorporation flow'] };
 }
 
@@ -562,11 +621,21 @@ function routeResponse(text) {
 function send() {
   var text = EL.ta.value.trim();
   if (!text) return;
+
+  // Paywall check: free users limited to N questions/month
+  if (!canAskQuestion()) {
+    openPaywall('limit');
+    return;
+  }
+
   if (!inChat) { enterChat(); flow = 'free'; EL.ht.textContent = 'Chat'; }
   EL.hb.style.display = 'inline-block';
   addUser(text);
   EL.ta.value = ''; EL.ta.style.height = 'auto';
   turn++;
+
+  // Track usage for free tier
+  incrementUsage();
 
   if (/start.*(flow|incorporation|onboard)|full.*flow|incorporate.*now|begin.*onboard/i.test(text)) {
     typeThen(400, function(){ startFlow('onboard'); }); return;
@@ -640,6 +709,29 @@ function typeThen(ms, fn){ addTyping(); setTimeout(fn, ms); }
 function scrollB(){ setTimeout(function(){ EL.msgs.scrollTop = EL.msgs.scrollHeight; }, 50); }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function newChat(){ showWelcome(); }
+
+// Build a doc card that respects the user's subscription.
+// Free/guest users see it as "locked" — clicking opens paywall.
+// Paid users get a real link to the document store.
+function buildDocCard(name, desc, badge) {
+  var iconHTML = '<div class="di"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>';
+  var infoHTML = '<div style="flex:1"><div class="dn">' + name + '</div><div class="dd">' + desc + '</div></div>';
+
+  if (hasDocumentAccess()) {
+    // Paid user — real link to doc store
+    return '<a class="dcard" href="https://www.businessdocs.ca" target="_blank">'
+      + iconHTML + infoHTML
+      + '<span class="db">' + badge + '</span>'
+      + '<div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></a>';
+  } else {
+    // Free/guest — locked; click opens paywall
+    var context = userPlan === 'guest' ? 'signin' : 'document';
+    return '<div class="dcard locked" onclick="openPaywall(\'' + context + '\')">'
+      + iconHTML + infoHTML
+      + '<span class="db dcard-lock-badge"><svg viewBox="0 0 10 10"><rect x="2.5" y="4.5" width="5" height="4" rx="0.5"/><path d="M3.5 4.5V3a1.5 1.5 0 013 0v1.5"/></svg>Locked</span>'
+      + '<div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></div>';
+  }
+}
 
 // ── CHAT PERSISTENCE ────────────────────────
 // Debounced save - waits 800ms after last change to batch writes
@@ -779,6 +871,178 @@ async function deleteChat(chatId) {
   }
 }
 
+// ── SUBSCRIPTION + USAGE ────────────────────
+function currentMonth() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+async function loadSubscription() {
+  if (!window.sb) { userPlan = 'guest'; updatePlanUI(); return; }
+  try {
+    var session = await window.sb.auth.getSession();
+    if (!session.data.session) { userPlan = 'guest'; updatePlanUI(); return; }
+    var userId = session.data.session.user.id;
+
+    // Load subscription
+    var subRes = await window.sb.from('subscriptions').select('plan, status').eq('user_id', userId).single();
+    if (subRes.data && (subRes.data.status === 'active' || subRes.data.status === 'trialing')) {
+      userPlan = subRes.data.plan;
+    } else {
+      userPlan = 'free';
+    }
+
+    // Load current month's usage
+    var month = currentMonth();
+    var usageRes = await window.sb.from('usage').select('questions_asked').eq('user_id', userId).eq('month', month).single();
+    usageCount = usageRes.data ? usageRes.data.questions_asked : 0;
+
+    updatePlanUI();
+
+    // Check for checkout success/cancel URL params
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') === 'success') {
+      setTimeout(function() {
+        alert('🎉 Welcome to LexAI Founder! Your subscription is now active. It may take a few seconds to reflect — refresh the page if needed.');
+        window.history.replaceState({}, '', '/lexai-chat.html');
+        // Reload sub after short delay to catch webhook
+        setTimeout(loadSubscription, 3000);
+      }, 500);
+    } else if (params.get('checkout') === 'canceled') {
+      window.history.replaceState({}, '', '/lexai-chat.html');
+    }
+  } catch (e) {
+    console.error('loadSubscription error:', e);
+    userPlan = 'free';
+    updatePlanUI();
+  }
+}
+
+function updatePlanUI() {
+  // Update sidebar user badge with plan info
+  var sbUser = document.querySelector('.sb-user');
+  if (sbUser) {
+    var planLabel = sbUser.querySelector('.sb-plan');
+    if (planLabel && userPlan !== 'guest') {
+      var planName = userPlan === 'founder' ? 'Founder plan' : userPlan === 'law_firm' ? 'Law Firm plan' : (usageCount + '/' + USAGE_LIMIT_FREE + ' questions');
+      planLabel.textContent = planName;
+    }
+  }
+  // Update input placeholder for free users nearing limit
+  if (userPlan === 'free' && EL.ta) {
+    var remaining = USAGE_LIMIT_FREE - usageCount;
+    if (remaining <= 5 && remaining > 0) {
+      EL.ta.placeholder = remaining + ' free question' + (remaining === 1 ? '' : 's') + ' left this month…';
+    } else if (remaining <= 0) {
+      EL.ta.placeholder = 'Upgrade to keep asking questions…';
+    }
+  }
+}
+
+async function incrementUsage() {
+  if (!window.sb) return;
+  if (userPlan === 'founder' || userPlan === 'law_firm') return; // unlimited
+  try {
+    var session = await window.sb.auth.getSession();
+    if (!session.data.session) return;
+    var userId = session.data.session.user.id;
+    var month = currentMonth();
+
+    // Upsert usage row
+    var res = await window.sb.from('usage').upsert({
+      user_id: userId,
+      month: month,
+      questions_asked: usageCount + 1,
+    }, { onConflict: 'user_id,month' });
+
+    if (!res.error) {
+      usageCount++;
+      updatePlanUI();
+    }
+  } catch (e) {
+    console.error('incrementUsage error:', e);
+  }
+}
+
+function canAskQuestion() {
+  if (userPlan === 'founder' || userPlan === 'law_firm') return true;
+  if (userPlan === 'guest') return true; // Guests can ask freely (no backend tracking)
+  return usageCount < USAGE_LIMIT_FREE;
+}
+
+function hasDocumentAccess() {
+  return userPlan === 'founder' || userPlan === 'law_firm';
+}
+
+// ── PAYWALL MODAL ────────────────────────────
+function openPaywall(context) {
+  var title = document.getElementById('pwTitle');
+  var sub = document.getElementById('pwSub');
+  if (context === 'document') {
+    title.innerHTML = 'Unlock <em>documents</em>';
+    sub.textContent = 'This document is attorney-reviewed and signed. Upgrade to Founder to unlock the full document library — 180+ templates, all reviewed by our in-house licensed attorney.';
+  } else if (context === 'limit') {
+    title.innerHTML = 'You\'ve hit your <em>limit</em>';
+    sub.textContent = "You've used all " + USAGE_LIMIT_FREE + " of your free questions this month. Upgrade to Founder for unlimited conversations and full document access.";
+  } else if (context === 'signin') {
+    title.innerHTML = 'Sign in to <em>continue</em>';
+    sub.textContent = 'Create a free account to save your chats and ask questions. No credit card required.';
+    document.getElementById('pwUpgradeBtn').textContent = 'Sign in or create account';
+    document.getElementById('pwUpgradeBtn').onclick = function() { window.location.href = '/'; };
+    document.getElementById('pwOverlay').classList.add('open');
+    return;
+  } else {
+    title.innerHTML = 'Upgrade to <em>Founder</em>';
+    sub.textContent = 'Unlimited AI conversations, full access to every attorney-reviewed document, and priority support.';
+  }
+  document.getElementById('pwUpgradeBtn').textContent = 'Upgrade to Founder — $49/mo';
+  document.getElementById('pwUpgradeBtn').onclick = function() { startCheckout('founder'); };
+  document.getElementById('pwOverlay').classList.add('open');
+}
+
+function closePaywall() {
+  document.getElementById('pwOverlay').classList.remove('open');
+}
+
+async function startCheckout(plan) {
+  if (!window.sb) return;
+  var session = await window.sb.auth.getSession();
+  if (!session.data.session) {
+    window.location.href = '/';
+    return;
+  }
+  var btn = document.getElementById('pwUpgradeBtn');
+  btn.disabled = true;
+  btn.textContent = 'Loading checkout...';
+  try {
+    var res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.data.session.access_token,
+      },
+      body: JSON.stringify({ plan: plan }),
+    });
+    var data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Could not start checkout: ' + (data.error || 'unknown error'));
+      btn.disabled = false;
+      btn.textContent = 'Upgrade to Founder — $49/mo';
+    }
+  } catch (e) {
+    alert('Could not start checkout. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Upgrade to Founder — $49/mo';
+  }
+}
+
+// Escape key closes paywall
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePaywall();
+});
+
 // ── INPUT EVENTS ────────────────────────────
 EL.ta.addEventListener('keydown', function(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
 EL.ta.addEventListener('input', function(){ EL.ta.style.height='auto'; EL.ta.style.height=Math.min(EL.ta.scrollHeight,150)+'px'; });
@@ -871,6 +1135,7 @@ showWelcome();
         console.log('✓ Supabase initialized successfully');
         initAuth();
         if (typeof loadHistory === 'function') loadHistory(); // load chat list
+        if (typeof loadSubscription === 'function') loadSubscription(); // load plan + usage
       } catch (e) {
         console.error('Supabase createClient error:', e);
         initAuth();
