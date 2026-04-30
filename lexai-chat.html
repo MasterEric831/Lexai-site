@@ -144,6 +144,41 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(-
 .sv { font-weight:500; }
 .stag { display:inline-block; font-size:10px; font-weight:500; padding:1px 7px; border-radius:8px; margin-left:6px; background:var(--green-bg); color:var(--green); }
 
+/* RISK PANEL */
+.risk { border:1px solid var(--ink10); border-radius:9px; background:#fff; overflow:hidden; margin-top:10px; }
+.risk-head { padding:10px 13px; border-bottom:1px solid var(--ink10); display:flex; align-items:center; gap:8px; }
+.risk-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.risk-icon.low { background:var(--green-bg); border:1px solid rgba(59,109,17,0.25); }
+.risk-icon.med { background:var(--gold-bg); border:1px solid rgba(184,151,74,0.3); }
+.risk-icon.high { background:#FCEBEB; border:1px solid rgba(121,31,31,0.25); }
+.risk-icon svg { width:14px; height:14px; stroke-width:1.5; fill:none; }
+.risk-icon.low svg { stroke:var(--green); }
+.risk-icon.med svg { stroke:var(--gold); }
+.risk-icon.high svg { stroke:#791F1F; }
+.risk-title { flex:1; }
+.risk-label { font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink30); }
+.risk-level { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:500; line-height:1.1; margin-top:1px; }
+.risk-level em { font-style:italic; }
+.risk-level.low { color:var(--green); } .risk-level.med { color:var(--gold); } .risk-level.high { color:#791F1F; }
+.risk-body { padding:10px 13px; }
+.risk-explain { font-size:12px; color:var(--ink60); line-height:1.55; margin-bottom:10px; }
+.risk-bars { display:flex; flex-direction:column; gap:7px; }
+.risk-row { display:flex; align-items:center; gap:8px; font-size:11px; }
+.risk-row-label { width:96px; flex-shrink:0; color:var(--ink60); }
+.risk-row-bar { flex:1; height:5px; background:var(--ink10); border-radius:3px; overflow:hidden; position:relative; }
+.risk-row-fill { height:100%; border-radius:3px; transition:width 0.6s ease; }
+.risk-row-fill.low { background:var(--green); }
+.risk-row-fill.med { background:var(--gold); }
+.risk-row-fill.high { background:#791F1F; }
+.risk-row-val { width:38px; text-align:right; font-weight:500; color:var(--ink); font-size:10px; }
+
+/* DOC RISK NOTE — small reasoning under each doc */
+.dcard-risk { font-size:11px; color:var(--ink60); margin-top:5px; padding-top:5px; border-top:1px solid rgba(26,24,20,0.06); line-height:1.45; }
+.dcard-risk strong { color:var(--ink); font-weight:500; }
+.dcard.has-risk { flex-wrap:wrap; padding:10px 13px 11px; }
+.dcard.has-risk > div:nth-child(2) { flex-basis:auto; }
+.dcard.has-risk .dcard-risk { width:100%; flex-basis:100%; }
+
 /* ATTY + PROGRESS */
 .an { display:none; align-items:center; gap:7px; padding:6px 10px; border-radius:6px; background:var(--gold-bg); border:1px solid rgba(184,151,74,0.25); font-size:11px; color:var(--gold); font-weight:500; margin-bottom:8px; width:100%; max-width:720px; }
 .an.show { display:flex; }
@@ -240,7 +275,7 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(-
     <div class="messages wmode" id="msgs"></div>
     <div class="ia">
       <div class="an" id="an"><svg viewBox="0 0 12 12"><circle cx="6" cy="4" r="2"/><path d="M2 10c0-2.2 1.8-4 4-4s4 1.8 4 4"/><polyline points="4.5,8.5 6,10 8,7" stroke-width="1.5"/></svg>In-house attorney reviews &amp; signs all documents before delivery</div>
-      <div class="pg" id="pg"><div class="pt"><div class="pf" id="pf"></div></div><div class="pl" id="pl">Step 1 of 6</div></div>
+      <div class="pg" id="pg"><div class="pt"><div class="pf" id="pf"></div></div><div class="pl" id="pl">Step 1 of 7</div></div>
       <div class="ib">
         <textarea class="it" id="ta" rows="1" placeholder="Ask anything about incorporation, business structure, or legal documents…"></textarea>
         <div class="if">
@@ -353,6 +388,17 @@ var OB = [
   { id:'goal', q:"Let's find the best structure for your business. What's the <strong>primary goal</strong>?", type:'s', choices:[
     {e:'🚀',l:'Raise venture capital / investors'},{e:'💼',l:'Run a small or solo business'},
     {e:'🤝',l:'Partnership between co-founders'},{e:'🏢',l:'Larger team or established company'},{e:'🔒',l:'Asset protection / holding company'}]},
+  { id:'industry', q:"What does your business <strong>actually do</strong>? This drives your liability exposure and shapes the legal structure we recommend.", type:'s', choices:[
+    {e:'💻',l:'Software, SaaS, or digital product'},
+    {e:'🛒',l:'E-commerce or physical product'},
+    {e:'🍽️',l:'Food, beverage, or hospitality'},
+    {e:'🏥',l:'Healthcare, wellness, or regulated profession'},
+    {e:'💰',l:'Financial, fintech, or crypto'},
+    {e:'🏗️',l:'Trades, construction, or physical services'},
+    {e:'🎨',l:'Creative, agency, or content business'},
+    {e:'📚',l:'Consulting or professional services'},
+    {e:'🌿',l:'Cannabis, alcohol, or other regulated goods'},
+    {e:'🎯',l:'Other / mixed'}]},
   { id:'size', q:"How many <strong>people</strong> will be part of this business?", type:'s', choices:[
     {e:'👤',l:'Just me (solo founder)'},{e:'👥',l:'2–3 co-founders'},
     {e:'🏃',l:'4–10 employees'},{e:'🏗️',l:'11–50 employees'},{e:'🏢',l:'50+ employees'}]},
@@ -371,7 +417,8 @@ var OB = [
   { id:'extras', q:"Which situations apply? <strong>Select all that apply.</strong>", type:'m', choices:[
     {e:'📋',l:'I have co-founders (equity split needed)'},{e:'💡',l:'I have pre-existing IP to transfer'},
     {e:'🤫',l:'Sharing confidential info with partners'},{e:'👷',l:'Plan to hire employees soon'},
-    {e:'📊',l:'Need a board of directors'},{e:'💰',l:'Raising outside investment'}]},
+    {e:'📊',l:'Need a board of directors'},{e:'💰',l:'Raising outside investment'},
+    {e:'🌐',l:'Selling internationally / cross-border'},{e:'🔐',l:'Handling customer data or PII'}]},
   { id:'when', q:"What's your <strong>timeline</strong>?", type:'s', choices:[
     {e:'⚡',l:'ASAP — this week'},{e:'📅',l:'Within the next month'},
     {e:'🗓️',l:'1–3 months from now'},{e:'🤔',l:'Just exploring for now'}]},
@@ -395,7 +442,7 @@ function showWelcome() {
   EL.hb.style.display = 'none';
   EL.pg.className = 'pg';
   EL.pf.style.width = '0%';
-  EL.pl.textContent = 'Step 1 of 6';
+  EL.pl.textContent = 'Step 1 of 7';
   EL.an.className = 'an';
   EL.ta.value = ''; EL.ta.style.height = 'auto';
 
@@ -440,7 +487,7 @@ function startFlow(f) {
     EL.pg.className = 'pg show';
     setProg(1);
     typeThen(800, function() {
-      addAI('<p>Great — I\'ll ask <strong>6 quick questions</strong> to figure out the best structure and which documents you\'ll need. Just pick what fits best.</p>');
+      addAI('<p>Great — I\'ll ask <strong>7 quick questions</strong> to figure out the best structure, calculate your business risk, and recommend the right documents. Just pick what fits best.</p>');
       setTimeout(function(){ typeThen(700, showOBStep); }, 900);
     });
   } else if (f === 'docs') {
@@ -523,9 +570,140 @@ function advOB(label) {
   else { setProg(OB.length,true); typeThen(1200, showRecs); }
 }
 
+// ── RISK CALCULATOR ─────────────────────────
+// Computes a risk profile across 6 dimensions based on onboarding answers.
+// Each dimension scored 1 (low) to 5 (critical). Returns {scores, overall, factors}.
+function calculateRisk(ans) {
+  var industry = ans.industry || '';
+  var size = ans.size || '';
+  var rev = ans.rev || '';
+  var extras = Array.isArray(ans.extras) ? ans.extras : [];
+
+  // Initialize
+  var s = { liability: 1, regulatory: 1, ip: 1, contract: 1, employment: 1, privacy: 1 };
+  var factors = []; // human-readable list of WHY each risk is elevated
+
+  // Industry-driven baseline scores
+  if (/Software|SaaS|digital/i.test(industry)) {
+    s.ip = 5; s.contract = 4; s.privacy = 4;
+    factors.push({ cat: 'IP', why: 'Your business value lives almost entirely in code, designs, and intellectual property — losing or mis-assigning IP can destroy the company.' });
+    factors.push({ cat: 'Contract', why: 'SaaS contracts include uptime SLAs, data terms, and termination clauses. Weak contracts create lawsuits.' });
+    factors.push({ cat: 'Privacy', why: 'Handling user data triggers PIPEDA compliance, breach notification, and cross-border data transfer rules.' });
+  } else if (/E-commerce|physical product/i.test(industry)) {
+    s.liability = 4; s.contract = 3; s.regulatory = 3; s.privacy = 3;
+    factors.push({ cat: 'Liability', why: 'Selling physical products exposes you to product liability — defective goods, injuries, recalls. Incorporation is essential to keep this off your personal assets.' });
+    factors.push({ cat: 'Regulatory', why: 'Consumer protection laws, Canada Consumer Product Safety Act, and provincial sales tax obligations all apply.' });
+  } else if (/Food|beverage|hospitality/i.test(industry)) {
+    s.liability = 5; s.regulatory = 5; s.employment = 3;
+    factors.push({ cat: 'Liability', why: 'Foodborne illness or allergen incidents can lead to severe lawsuits and brand-ending publicity. Highest priority for a properly structured corporation.' });
+    factors.push({ cat: 'Regulatory', why: 'Health inspections, food safety certifications, alcohol licensing, and provincial food handling rules apply.' });
+  } else if (/Healthcare|wellness|regulated profession/i.test(industry)) {
+    s.liability = 5; s.regulatory = 5; s.privacy = 5; s.contract = 4;
+    factors.push({ cat: 'Liability', why: 'Professional negligence claims and patient harm lawsuits are an existential risk — incorporation alone may not be enough; you likely need professional liability insurance.' });
+    factors.push({ cat: 'Regulatory', why: 'Provincial regulatory colleges, scope of practice limits, and licensing rules govern almost everything you do.' });
+    factors.push({ cat: 'Privacy', why: 'Patient/client health data is among the most sensitive PII under PIPEDA and provincial health privacy acts (PHIPA in Ontario).' });
+  } else if (/Financial|fintech|crypto/i.test(industry)) {
+    s.regulatory = 5; s.liability = 4; s.privacy = 5; s.contract = 4;
+    factors.push({ cat: 'Regulatory', why: 'OSC/CSA securities rules, FINTRAC AML/KYC requirements, and provincial money services business registration all apply. Non-compliance can be criminal.' });
+    factors.push({ cat: 'Privacy', why: 'Financial data is heavily regulated — FINTRAC reporting, PIPEDA, and provincial banking rules.' });
+  } else if (/Trades|construction|physical services/i.test(industry)) {
+    s.liability = 5; s.employment = 4; s.regulatory = 3; s.contract = 4;
+    factors.push({ cat: 'Liability', why: 'Property damage, injuries on job sites, and warranty claims are constant exposure. Without incorporation, every claim hits your personal assets.' });
+    factors.push({ cat: 'Employment', why: 'WSIB premiums, trade certifications, and apprenticeship rules add serious overhead.' });
+  } else if (/Creative|agency|content/i.test(industry)) {
+    s.ip = 4; s.contract = 4; s.liability = 2;
+    factors.push({ cat: 'IP', why: 'Without explicit assignment in client contracts, ownership of creative work can be ambiguous — your IP terms are everything.' });
+    factors.push({ cat: 'Contract', why: 'Scope creep, payment disputes, and licensing terms are the most common sources of agency lawsuits.' });
+  } else if (/Consulting|professional services/i.test(industry)) {
+    s.liability = 4; s.contract = 4; s.privacy = 3;
+    factors.push({ cat: 'Liability', why: 'Bad professional advice that causes a client loss can lead to negligence claims. Errors & omissions insurance plus incorporation is the standard combo.' });
+    factors.push({ cat: 'Contract', why: 'Scope, deliverables, and limitation of liability clauses determine whether you survive a lawsuit.' });
+  } else if (/Cannabis|alcohol|regulated goods/i.test(industry)) {
+    s.regulatory = 5; s.liability = 4; s.contract = 3;
+    factors.push({ cat: 'Regulatory', why: 'Cannabis Act, provincial liquor authorities, retail licensing, advertising restrictions — every operational decision is a regulatory question.' });
+    factors.push({ cat: 'Liability', why: 'Sale to minors, intoxication-related incidents, and product defects all create liability exposure.' });
+  }
+
+  // Size-driven adjustments
+  if (/4–10 employees|11–50|50\+/i.test(size)) {
+    s.employment = Math.max(s.employment, 3);
+    if (/11–50|50\+/i.test(size)) s.employment = Math.max(s.employment, 4);
+    if (/50\+/i.test(size)) s.employment = 5;
+    factors.push({ cat: 'Employment', why: 'With ' + size.toLowerCase() + ', you face wrongful dismissal, harassment, WSIB, EI/CPP, and provincial labour code obligations on every hire.' });
+  }
+
+  // Revenue-driven adjustments — higher revenue means contract & tax exposure
+  if (/\$1M\+|Series A|Already funded/i.test(rev)) {
+    s.contract = Math.max(s.contract, 4);
+    factors.push({ cat: 'Contract', why: 'At your revenue level, contract disputes, vendor obligations, and customer guarantees are routine — strong contractual protection is non-negotiable.' });
+  }
+
+  // Extras-driven adjustments
+  if (extras.some(function(e){return /co-founder/i.test(e);})) {
+    s.contract = Math.max(s.contract, 4);
+    factors.push({ cat: 'Contract', why: 'Co-founder disputes are the #1 cause of early-stage startup failure. A shareholders\' agreement with vesting and exit provisions is critical.' });
+  }
+  if (extras.some(function(e){return /IP/i.test(e);})) {
+    s.ip = Math.max(s.ip, 4);
+    factors.push({ cat: 'IP', why: 'Pre-existing IP must be formally transferred to the corporation — usually via Section 85 rollover — or the company doesn\'t actually own its core asset.' });
+  }
+  if (extras.some(function(e){return /international|cross.?border/i.test(e);})) {
+    s.regulatory = Math.max(s.regulatory, 4); s.contract = Math.max(s.contract, 4);
+    factors.push({ cat: 'Regulatory', why: 'Cross-border sales trigger US sales tax (state nexus rules), GDPR if EU customers, and customs/import compliance.' });
+  }
+  if (extras.some(function(e){return /customer data|PII/i.test(e);})) {
+    s.privacy = Math.max(s.privacy, 5);
+    factors.push({ cat: 'Privacy', why: 'Handling customer PII triggers PIPEDA at minimum, plus provincial privacy laws. Breach notifications are mandatory; negligence is a public liability.' });
+  }
+  if (extras.some(function(e){return /invest|investment/i.test(e);})) {
+    s.regulatory = Math.max(s.regulatory, 3);
+    factors.push({ cat: 'Regulatory', why: 'Raising capital triggers securities laws (NI 45-106 prospectus exemptions in Canada). Improperly issued shares can void equity grants.' });
+  }
+
+  // Compute overall score (max of dimensions, weighted)
+  var maxScore = Math.max(s.liability, s.regulatory, s.ip, s.contract, s.employment, s.privacy);
+  var avgScore = (s.liability + s.regulatory + s.ip + s.contract + s.employment + s.privacy) / 6;
+  var composite = Math.round((maxScore * 0.6 + avgScore * 0.4) * 10) / 10;
+
+  var level = 'low';
+  if (composite >= 4.2) level = 'critical';
+  else if (composite >= 3.3) level = 'high';
+  else if (composite >= 2.2) level = 'medium';
+
+  return { scores: s, factors: factors, composite: composite, level: level };
+}
+
+// Helper: returns a CSS color class for risk level
+function riskLevelColor(level) {
+  if (level === 'critical') return '#8C1C13';
+  if (level === 'high') return '#B8541E';
+  if (level === 'medium') return '#B8974A';
+  return '#3B6D11';
+}
+
+// Helper: per-document risk justification
+function docRiskRationale(docName, risk) {
+  var n = docName.toLowerCase();
+  if (n.indexOf('shareholders') >= 0) return 'Locks down founder rights and exit terms — without this, co-founder disputes can paralyze the company.';
+  if (n.indexOf('vesting') >= 0) return 'Protects the company if a founder leaves — earned-over-time shares prevent walk-away ownership.';
+  if (n.indexOf('ip assignment') >= 0) return 'Without this, the corporation may not legally own its own IP — a deal-breaker for any investor or acquirer.';
+  if (n.indexOf('employment') >= 0) return 'Defines IP ownership, confidentiality, and termination rights — all critical to limiting employment litigation exposure.';
+  if (n.indexOf('nda') >= 0) return 'Prevents partners, vendors, and prospective hires from leaking or weaponizing confidential information.';
+  if (n.indexOf('by-laws') >= 0 || n.indexOf('bylaws') >= 0) return 'Defines how the corporation makes decisions — required at incorporation; absent or weak by-laws cause governance disputes.';
+  if (n.indexOf('articles of incorporation') >= 0) return 'The legal foundation of the corporation — share classes and structure here determine future financing flexibility.';
+  if (n.indexOf('directors') >= 0 || n.indexOf('resolutions') >= 0) return 'Records the first official acts of the board — required for opening bank accounts and issuing initial shares.';
+  if (n.indexOf('section 85') >= 0) return 'Lets you transfer pre-incorporation assets (IP, equipment, sole prop business) into the corporation tax-deferred. Skip this and you may owe immediate tax on transferred value.';
+  if (n.indexOf('cra business number') >= 0) return 'Legally required for HST, payroll, and corporate tax filings. CRA expects you to have one before doing business.';
+  if (n.indexOf('hst') >= 0 || n.indexOf('gst') >= 0) return 'Mandatory once revenue exceeds $30K in any 12-month period. Late registration triggers retroactive HST owed plus penalties.';
+  if (n.indexOf('sole proprietorship registration') >= 0) return 'Required by your province before you can legally operate or open a business bank account under a name other than your own.';
+  return 'Foundational document for your structure — its absence creates legal ambiguity that compounds as the business grows.';
+}
+
 function showRecs() {
-  var goal = obAns.goal || ''; var size = obAns.size || '';
+  var goal = obAns.goal || '';
+  var size = obAns.size || '';
   var state = obAns.state || '';
+  var industry = obAns.industry || '';
   var extras = Array.isArray(obAns.extras) ? obAns.extras : [];
   var isVC   = /venture|invest/i.test(goal) || extras.some(function(e){return /invest/i.test(e);});
   var isSolo = /solo|just me/i.test(size);
@@ -540,22 +718,33 @@ function showRecs() {
   else if (/Atlantic/i.test(state)) prov = 'Atlantic Canada';
   else if (/Yukon|NWT|Nunavut/i.test(state)) prov = 'Northern Territory';
 
-  // Recommend entity
+  // ─── CALCULATE RISK ───────────────────────
+  var risk = calculateRisk(obAns);
+  var riskHigh = risk.level === 'high' || risk.level === 'critical';
+
+  // ─── ENTITY RECOMMENDATION (risk-aware) ───
   var rec, note;
   if (isVC) {
     rec = 'Federal Corporation (CBCA)';
-    note = 'Canadian VCs strongly prefer federal incorporation under the CBCA — it gives you flexibility to operate across provinces, and aligns with what investors expect. You\'ll also want to maintain CCPC status to qualify for SR&ED tax credits and the Lifetime Capital Gains Exemption.';
-  } else if (isSolo) {
+    note = 'Canadian VCs strongly prefer federal incorporation under the CBCA. Maintain CCPC status to qualify for SR&ED and the Lifetime Capital Gains Exemption.';
+  } else if (riskHigh && isSolo) {
+    // CRITICAL: high-risk solo founders should NOT stay sole prop
+    rec = 'Provincial or Federal Corporation';
+    note = '<strong>Strongly recommend incorporating despite being solo.</strong> Your business has high liability or regulatory exposure — staying as a sole proprietor means a single lawsuit or regulatory action could take your personal assets (home, savings). Incorporation is essential here.';
+  } else if (isSolo && risk.level === 'low') {
     rec = 'Sole Proprietorship';
-    note = 'A sole proprietorship is the simplest and cheapest setup — but you have unlimited personal liability. Once your business has any meaningful risk or revenue, incorporating (federal or provincial) becomes worth the cost.';
+    note = 'Your risk profile is low enough that a sole proprietorship is workable for now — simple, cheap, and avoids the overhead of a corporation. Revisit this as you grow.';
+  } else if (isSolo) {
+    rec = 'Sole Prop now, plan to incorporate within 12 months';
+    note = 'You can start as a sole proprietor, but your medium risk profile means you should plan to incorporate before the business grows further. Section 85 rollover lets you convert tax-deferred when you\'re ready.';
   } else {
     rec = prov.indexOf('Federal') === 0 ? 'Federal Corporation (CBCA)' : 'Provincial Corporation (' + prov + ')';
     note = 'Incorporating limits your personal liability and opens up tax planning options. Federal incorporation gives nationwide name protection; provincial is cheaper but more limited.';
   }
 
-  // Build documents list — Canadianized
+  // ─── BUILD DOCUMENT LIST (risk-aware) ─────
   var docs = [];
-  if (isSolo && !isVC) {
+  if (isSolo && !isVC && risk.level === 'low') {
     docs.push({n:'Sole Proprietorship Registration',d:'Register your business name with your province',b:'Formation'});
     docs.push({n:'GST/HST Registration Guide',d:'Required if revenue exceeds $30K/year',b:'Tax'});
   } else {
@@ -563,33 +752,113 @@ function showRecs() {
     docs.push({n:'Corporate By-laws',d:'Governance and operating rules',b:'Required'});
     docs.push({n:'Initial Directors\' Resolutions',d:'First board actions: officers, share issuance, banking',b:'Governance'});
   }
-  if(extras.some(function(e){return /co-founder/i.test(e);})) docs.push({n:'Founder Share Vesting Agreement',d:'4-year vest, 1-year cliff',b:'Equity'});
-  if(extras.some(function(e){return /IP/i.test(e);}))         docs.push({n:'IP Assignment Agreement',d:'Transfer pre-company IP to corporation (Section 85 rollover eligible)',b:'IP'});
-  if(extras.some(function(e){return /confidential/i.test(e);})) docs.push({n:'Mutual NDA',d:'Protect confidential discussions',b:'Privacy'});
-  if(extras.some(function(e){return /employ/i.test(e);}))     docs.push({n:'Employment Agreement',d:'Includes IP assignment & non-compete clauses',b:'HR'});
-  if(isVC||extras.some(function(e){return /invest/i.test(e);})) {
-    docs.push({n:'Shareholders\' Agreement',d:'Founder rights, transfer restrictions, drag-along',b:'Equity'});
+
+  // Risk-driven additions
+  if (extras.some(function(e){return /co-founder/i.test(e);})) docs.push({n:'Founder Share Vesting Agreement',d:'4-year vest, 1-year cliff',b:'Equity'});
+  if (extras.some(function(e){return /co-founder/i.test(e);}) || isVC) docs.push({n:'Shareholders\' Agreement',d:'Founder rights, transfer restrictions, drag-along',b:'Equity'});
+  if (extras.some(function(e){return /IP/i.test(e);}) || risk.scores.ip >= 4) {
+    docs.push({n:'IP Assignment Agreement',d:'Transfer pre-company IP to corporation (Section 85 eligible)',b:'IP'});
+  }
+  if (extras.some(function(e){return /confidential/i.test(e);}) || risk.scores.contract >= 4) {
+    docs.push({n:'Mutual NDA',d:'Protect confidential discussions',b:'Privacy'});
+  }
+  if (extras.some(function(e){return /employ/i.test(e);}) || risk.scores.employment >= 3) {
+    docs.push({n:'Employment Agreement',d:'Includes IP assignment & non-compete clauses',b:'HR'});
+  }
+  if (risk.scores.privacy >= 4) {
+    docs.push({n:'Privacy Policy & PIPEDA Compliance Pack',d:'Privacy notice, breach response, data handling',b:'Privacy'});
+  }
+  if (risk.scores.liability >= 4) {
+    docs.push({n:'Limitation of Liability Clauses',d:'Standard terms for client/customer contracts',b:'Liability'});
+  }
+  if (risk.scores.regulatory >= 4) {
+    docs.push({n:'Regulatory Compliance Checklist',d:'Industry-specific filing & reporting requirements',b:'Regulatory'});
+  }
+  if (risk.scores.contract >= 4) {
+    docs.push({n:'Master Services Agreement Template',d:'Reusable customer/vendor contract baseline',b:'Contract'});
   }
   docs.push({n:'CRA Business Number Registration',d:'Required for HST, payroll, corporate tax',b:'CRA'});
 
+  // ─── BUILD UI ──────────────────────────────
   var sumH = '<div class="summ"><div class="sh"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><polyline points="4,6 5.5,7.5 8.5,4.5"/></svg>Your profile</div>'
-    + row('Goal', obAns.goal||'—') + row('Team', obAns.size||'—') + row('Revenue', obAns.rev||'—')
-    + row('Jurisdiction', obAns.state||'—') + '<div class="sr"><span class="sk">Entity</span><span class="sv">' + rec + ' <span class="stag">Best fit</span></span></div></div>';
+    + row('Goal', obAns.goal||'—')
+    + row('Industry', obAns.industry||'—')
+    + row('Team', obAns.size||'—')
+    + row('Revenue', obAns.rev||'—')
+    + row('Jurisdiction', obAns.state||'—')
+    + '<div class="sr"><span class="sk">Entity</span><span class="sv">' + rec + ' <span class="stag">Best fit</span></span></div></div>';
 
+  // RISK CARD — colored bar with breakdown
+  var riskColor = riskLevelColor(risk.level);
+  var riskLabel = risk.level.toUpperCase();
+  var riskH = '<div class="risk-card" style="border:1px solid ' + riskColor + '33;border-left:3px solid ' + riskColor + ';background:#fff;border-radius:9px;padding:13px 15px;margin-top:10px;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+    + '<div style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--ink30);display:flex;align-items:center;gap:6px;">'
+    + '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="' + riskColor + '" stroke-width="1.5"><path d="M5.5 1L10 9.5H1z"/><line x1="5.5" y1="4" x2="5.5" y2="6.5"/><circle cx="5.5" cy="8" r="0.5" fill="' + riskColor + '"/></svg>'
+    + 'Risk Profile</div>'
+    + '<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:' + riskColor + '22;color:' + riskColor + ';">' + riskLabel + '</span>'
+    + '</div>';
+
+  // Risk dimension bars
+  var dimensions = [
+    {key:'liability', label:'Liability'},
+    {key:'regulatory', label:'Regulatory'},
+    {key:'ip', label:'IP'},
+    {key:'contract', label:'Contract'},
+    {key:'employment', label:'Employment'},
+    {key:'privacy', label:'Privacy'},
+  ];
+  riskH += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px 14px;margin-bottom:10px;">';
+  dimensions.forEach(function(d) {
+    var score = risk.scores[d.key];
+    var bars = '';
+    for (var i = 1; i <= 5; i++) {
+      var filled = i <= score;
+      var color = filled ? (score >= 4 ? '#8C1C13' : score >= 3 ? '#B8974A' : '#3B6D11') : 'var(--ink10)';
+      bars += '<div style="flex:1;height:4px;border-radius:1px;background:' + color + ';"></div>';
+    }
+    riskH += '<div><div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:11px;color:var(--ink60);"><span>' + d.label + '</span><span style="color:var(--ink30)">' + score + '/5</span></div>'
+         + '<div style="display:flex;gap:2px;">' + bars + '</div></div>';
+  });
+  riskH += '</div>';
+
+  // Top risk factors (short list)
+  if (risk.factors.length > 0) {
+    riskH += '<div style="border-top:1px solid var(--ink10);padding-top:9px;margin-top:5px;">'
+      + '<div style="font-size:10px;font-weight:500;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink30);margin-bottom:6px;">Why this matters</div>';
+    risk.factors.slice(0, 3).forEach(function(f) {
+      riskH += '<div style="font-size:12px;line-height:1.5;color:var(--ink);margin-bottom:5px;">'
+        + '<span style="font-weight:500;color:' + riskColor + ';">' + f.cat + ':</span> ' + f.why
+        + '</div>';
+    });
+    if (risk.factors.length > 3) {
+      riskH += '<div style="font-size:11px;color:var(--ink30);font-style:italic;margin-top:4px;">+ ' + (risk.factors.length - 3) + ' more risk factor(s) addressed by the documents below.</div>';
+    }
+    riskH += '</div>';
+  }
+  riskH += '</div>';
+
+  // Documents grid with risk rationale baked in
   var dcH = '<div class="dcards">' + docs.map(function(d){
-    return buildDocCard(d.n, d.d, d.b);
+    var rationale = docRiskRationale(d.n, risk);
+    return buildDocCardWithRisk(d.n, d.d, d.b, rationale);
   }).join('') + '</div>';
 
-  EL.ht.textContent = 'Incorporation plan ready';
+  EL.ht.textContent = 'Plan ready';
   EL.hb.style.cssText = 'display:inline-block;background:var(--green-bg);color:var(--green);border:1px solid rgba(59,109,17,0.2)';
   EL.an.className = 'an show';
   EL.pg.className = 'pg';
 
-  addAI('<p><strong>Recommended: ' + rec + '</strong><br>' + note + '</p><p>Here are the documents you\'ll need:</p>', sumH + dcH);
+  addAI('<p><strong>Recommended: ' + rec + '</strong><br>' + note + '</p>', sumH + riskH);
+
+  setTimeout(function() {
+    addAI('<p>Here are the documents your specific risk profile calls for. Each one addresses a real exposure in your business — click any document to learn more.</p>', dcH);
+  }, 1200);
+
   setTimeout(function(){
-    addAI('<p>Click any document above to access it in the store — all reviewed by our in-house Canadian-licensed lawyer. What questions do you have?</p>',
-      suggs(['What do I do first after incorporating?','Federal vs provincial — which is right for me?','Explain the Lifetime Capital Gains Exemption','How does Canadian founder vesting work?']));
-  }, 1500);
+    addAI('<p>All documents are reviewed by our in-house Canadian-licensed lawyer. What questions do you have about your risk profile or the recommendations?</p>',
+      suggs(['Why is my ' + (risk.level) + ' risk what it is?','Federal vs provincial — which is right for me?','What\'s the most urgent thing to do first?','Explain the Lifetime Capital Gains Exemption']));
+  }, 2400);
 }
 
 function row(k, v) { return '<div class="sr"><span class="sk">'+k+'</span><span class="sv">'+v+'</span></div>'; }
@@ -610,6 +879,10 @@ var QAB = {
 function qaResp(t) {
   var q = t.toLowerCase();
   var ans;
+  // Special: questions about the user's own risk profile
+  if (/\b(my|our) (risk|profile|score)|why.{1,20}risk|what.{1,15}risk|risk profile/i.test(q)) {
+    return riskExplainResp();
+  }
   if (/lcge|lifetime capital|capital gains exemption/i.test(q)) ans = QAB['lcge'];
   else if (/section.?85|rollover|transfer.{1,30}(asset|ip)/i.test(q)) ans = QAB['section85'];
   else if (/federal.*provincial|provincial.*federal|cbca.*obca|federal vs/i.test(q)) ans = QAB['fed_prov'];
@@ -620,6 +893,53 @@ function qaResp(t) {
   else if (/board|director/i.test(q)) ans = QAB['board'];
   else ans = QAB['def'];
   return { t:ans, s:['Tell me more','What document do I need for this?','Ask another question','Start the full incorporation flow'] };
+}
+
+// Generates an on-the-fly explanation of the user's current risk profile.
+// Reads obAns at call time, computes risk, returns a tailored message.
+function riskExplainResp() {
+  if (!obAns.industry) {
+    return {
+      t: '<p>I don\'t have your business profile yet — run the full incorporation flow first and I\'ll give you a personalized risk breakdown based on your industry, team, and exposure.</p>',
+      s: ['Start the full incorporation flow','Find a document','Ask a different question'],
+    };
+  }
+  var risk = calculateRisk(obAns);
+  var color = riskLevelColor(risk.level);
+  var levelText = risk.level.toUpperCase();
+
+  var html = '<p>Your risk profile is <strong style="color:' + color + ';">' + levelText + '</strong> (composite score ' + risk.composite + '/5). Here\'s why each dimension scored where it did:</p>';
+
+  var dims = [
+    {key:'liability', label:'Liability'},
+    {key:'regulatory', label:'Regulatory'},
+    {key:'ip', label:'IP'},
+    {key:'contract', label:'Contract'},
+    {key:'employment', label:'Employment'},
+    {key:'privacy', label:'Privacy'},
+  ];
+  html += '<ul style="margin:8px 0;padding-left:18px;line-height:1.7;">';
+  dims.forEach(function(d) {
+    var s = risk.scores[d.key];
+    var label = s >= 4 ? 'high' : s >= 3 ? 'medium' : 'low';
+    html += '<li><strong>' + d.label + ':</strong> ' + s + '/5 (' + label + ')</li>';
+  });
+  html += '</ul>';
+
+  if (risk.factors.length > 0) {
+    html += '<p><strong>The specific factors driving this:</strong></p><ul style="margin:8px 0;padding-left:18px;line-height:1.7;">';
+    risk.factors.forEach(function(f) {
+      html += '<li><strong>' + f.cat + ':</strong> ' + f.why + '</li>';
+    });
+    html += '</ul>';
+  }
+
+  html += '<p>The document recommendations from your plan address each of these — that\'s why they\'re ranked the way they are.</p>';
+
+  return {
+    t: html,
+    s: ['Federal vs provincial — which is right for me?','What\'s the most urgent thing to do first?','Show my documents again','Explain a specific document'],
+  };
 }
 
 function docsResp(t) {
@@ -780,6 +1100,31 @@ function buildDocCard(name, desc, badge) {
       + iconHTML + infoHTML
       + '<span class="db dcard-lock-badge"><svg viewBox="0 0 10 10"><rect x="2.5" y="4.5" width="5" height="4" rx="0.5"/><path d="M3.5 4.5V3a1.5 1.5 0 013 0v1.5"/></svg>Locked</span>'
       + '<div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></div>';
+  }
+}
+
+// Variant of buildDocCard that includes a risk rationale subtitle
+function buildDocCardWithRisk(name, desc, badge, rationale) {
+  var iconHTML = '<div class="di"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>';
+  var infoHTML = '<div style="flex:1;min-width:0;">'
+    + '<div class="dn">' + name + '</div>'
+    + '<div class="dd">' + desc + '</div>'
+    + '<div style="font-size:11px;color:var(--ink60);font-style:italic;margin-top:6px;line-height:1.45;border-left:2px solid var(--gold);padding-left:8px;">' + rationale + '</div>'
+    + '</div>';
+
+  if (hasDocumentAccess()) {
+    return '<a class="dcard" href="https://www.businessdocs.ca" target="_blank" style="align-items:flex-start;">'
+      + iconHTML + infoHTML
+      + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">'
+      + '<span class="db">' + badge + '</span>'
+      + '<div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></div></a>';
+  } else {
+    var context = userPlan === 'guest' ? 'signin' : 'document';
+    return '<div class="dcard locked" onclick="openPaywall(\'' + context + '\')" style="align-items:flex-start;">'
+      + iconHTML + infoHTML
+      + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">'
+      + '<span class="db dcard-lock-badge"><svg viewBox="0 0 10 10"><rect x="2.5" y="4.5" width="5" height="4" rx="0.5"/><path d="M3.5 4.5V3a1.5 1.5 0 013 0v1.5"/></svg>Locked</span>'
+      + '<div class="darr"><svg viewBox="0 0 14 14"><polyline points="4,2 10,7 4,12"/></svg></div></div></div>';
   }
 }
 
