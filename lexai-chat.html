@@ -359,9 +359,15 @@ var OB = [
   { id:'rev', q:"Expected <strong>revenue or funding</strong> in year one?", type:'s', choices:[
     {e:'🌱',l:'Pre-revenue / just starting'},{e:'💵',l:'Under $100K annually'},
     {e:'📈',l:'$100K – $1M annually'},{e:'🚀',l:'Seeking seed or Series A funding'},{e:'🏦',l:'Already funded or $1M+'}]},
-  { id:'state', q:"Which <strong>state</strong> are you incorporating in?", type:'s', choices:[
-    {e:'🏛️',l:'Delaware (recommended for VC)'},{e:'⚡',l:'Nevada or Wyoming (privacy)'},
-    {e:'🌟',l:'California'},{e:'🗽',l:'New York'},{e:'📍',l:'My home state (other)'}]},
+  { id:'state', q:"Where are you <strong>incorporating</strong>?", type:'s', choices:[
+    {e:'🍁',l:'Federal (CBCA — recommended for most startups)'},
+    {e:'🏛️',l:'Ontario (OBCA)'},
+    {e:'🌲',l:'British Columbia (BCBCA)'},
+    {e:'⚜️',l:'Quebec'},
+    {e:'🛢️',l:'Alberta'},
+    {e:'🌾',l:'Saskatchewan or Manitoba'},
+    {e:'🌊',l:'Atlantic Canada (NB, NS, PEI, NL)'},
+    {e:'❄️',l:'Yukon, NWT, or Nunavut'}]},
   { id:'extras', q:"Which situations apply? <strong>Select all that apply.</strong>", type:'m', choices:[
     {e:'📋',l:'I have co-founders (equity split needed)'},{e:'💡',l:'I have pre-existing IP to transfer'},
     {e:'🤫',l:'Sharing confidential info with partners'},{e:'👷',l:'Plan to hire employees soon'},
@@ -442,19 +448,19 @@ function startFlow(f) {
     EL.an.className = 'an show';
     typeThen(700, function() {
       addAI('<p>What kind of document are you looking for? Describe it in plain English and I\'ll match you to the right template in the store.</p>',
-        suggs(['I need an NDA for a business partner','I want a vesting agreement for my co-founder','I need to transfer my IP to my company','I\'m looking for corporate bylaws']));
+        suggs(['I need an NDA for a business partner','I want a vesting agreement for my co-founder','I need to transfer my IP to my corporation','I\'m looking for corporate by-laws']));
     });
   } else if (f === 'qa') {
     EL.ht.textContent = 'Legal Q&A';
     typeThen(700, function() {
       addAI('<p>Ask me anything about business formation, corporate law, equity, or filings — I\'ll explain it in plain English.</p>',
-        suggs(['What is an 83(b) election?','What\'s the difference between an LLC and a C-Corp?','How does founder vesting work?','When do I need a board of directors?']));
+        suggs(['What is the Lifetime Capital Gains Exemption?','Federal vs provincial incorporation — which is right for me?','How does Canadian founder vesting work?','What is a CCPC and why does it matter?']));
     });
   } else if (f === 'structure') {
     EL.ht.textContent = 'Business structure review';
     typeThen(700, function() {
       addAI('<p>Tell me about your current situation — entity type, how many founders, what state you\'re in, and whether you plan to raise capital.</p>',
-        suggs(['I\'m a solo founder, not incorporated yet','I have 2 co-founders deciding on structure','I have an LLC but want to raise investment','I\'m already incorporated — want a checkup']));
+        suggs(['I\'m a solo founder, not incorporated yet','I have 2 co-founders deciding on structure','I\'m a sole prop and want to raise investment','I\'m already incorporated — want a checkup']));
     });
   }
 }
@@ -519,28 +525,56 @@ function advOB(label) {
 
 function showRecs() {
   var goal = obAns.goal || ''; var size = obAns.size || '';
+  var state = obAns.state || '';
   var extras = Array.isArray(obAns.extras) ? obAns.extras : [];
   var isVC   = /venture|invest/i.test(goal) || extras.some(function(e){return /invest/i.test(e);});
   var isSolo = /solo|just me/i.test(size);
-  var rec  = isVC ? 'C-Corporation (Delaware)' : isSolo ? 'Single-Member LLC' : 'LLC or C-Corp';
-  var note = isVC ? 'Investors strongly prefer C-Corps for equity flexibility. Delaware is the standard.'
-           : isSolo ? 'An LLC gives liability protection with minimal overhead — ideal for solo founders.'
-           : 'Either structure could work. We\'ll walk through the trade-offs in more detail.';
 
-  var docs = [
-    {n:isVC?'Articles of Incorporation (Delaware C-Corp)':'Articles of Organization', d:'Primary formation document', b:isVC?'C-Corp':'LLC'},
-    {n:isVC?'Corporate Bylaws':'LLC Operating Agreement', d:'Governance and operating rules', b:'Required'},
-  ];
-  if(extras.some(function(e){return /co-founder/i.test(e);})) docs.push({n:'Founder Vesting Agreement',d:'4-year vest, 1-year cliff',b:'Equity'});
-  if(extras.some(function(e){return /IP/i.test(e);}))         docs.push({n:'IP Assignment Agreement',d:'Transfer pre-company IP to entity',b:'IP'});
+  // Determine jurisdiction
+  var prov = 'Federal (CBCA)';
+  if (/Ontario/i.test(state)) prov = 'Ontario (OBCA)';
+  else if (/British Columbia/i.test(state)) prov = 'British Columbia (BCBCA)';
+  else if (/Quebec/i.test(state)) prov = 'Quebec';
+  else if (/Alberta/i.test(state)) prov = 'Alberta';
+  else if (/Saskatchewan|Manitoba/i.test(state)) prov = 'Saskatchewan/Manitoba';
+  else if (/Atlantic/i.test(state)) prov = 'Atlantic Canada';
+  else if (/Yukon|NWT|Nunavut/i.test(state)) prov = 'Northern Territory';
+
+  // Recommend entity
+  var rec, note;
+  if (isVC) {
+    rec = 'Federal Corporation (CBCA)';
+    note = 'Canadian VCs strongly prefer federal incorporation under the CBCA — it gives you flexibility to operate across provinces, and aligns with what investors expect. You\'ll also want to maintain CCPC status to qualify for SR&ED tax credits and the Lifetime Capital Gains Exemption.';
+  } else if (isSolo) {
+    rec = 'Sole Proprietorship';
+    note = 'A sole proprietorship is the simplest and cheapest setup — but you have unlimited personal liability. Once your business has any meaningful risk or revenue, incorporating (federal or provincial) becomes worth the cost.';
+  } else {
+    rec = prov.indexOf('Federal') === 0 ? 'Federal Corporation (CBCA)' : 'Provincial Corporation (' + prov + ')';
+    note = 'Incorporating limits your personal liability and opens up tax planning options. Federal incorporation gives nationwide name protection; provincial is cheaper but more limited.';
+  }
+
+  // Build documents list — Canadianized
+  var docs = [];
+  if (isSolo && !isVC) {
+    docs.push({n:'Sole Proprietorship Registration',d:'Register your business name with your province',b:'Formation'});
+    docs.push({n:'GST/HST Registration Guide',d:'Required if revenue exceeds $30K/year',b:'Tax'});
+  } else {
+    docs.push({n:'Articles of Incorporation (' + (isVC ? 'CBCA' : prov) + ')',d:'Primary formation document',b:isVC?'CBCA':'Corporation'});
+    docs.push({n:'Corporate By-laws',d:'Governance and operating rules',b:'Required'});
+    docs.push({n:'Initial Directors\' Resolutions',d:'First board actions: officers, share issuance, banking',b:'Governance'});
+  }
+  if(extras.some(function(e){return /co-founder/i.test(e);})) docs.push({n:'Founder Share Vesting Agreement',d:'4-year vest, 1-year cliff',b:'Equity'});
+  if(extras.some(function(e){return /IP/i.test(e);}))         docs.push({n:'IP Assignment Agreement',d:'Transfer pre-company IP to corporation (Section 85 rollover eligible)',b:'IP'});
   if(extras.some(function(e){return /confidential/i.test(e);})) docs.push({n:'Mutual NDA',d:'Protect confidential discussions',b:'Privacy'});
-  if(extras.some(function(e){return /employ/i.test(e);}))     docs.push({n:'Employment Agreement',d:'Contractor and employee terms',b:'HR'});
-  if(isVC||extras.some(function(e){return /invest/i.test(e);})) docs.push({n:'Board Consent Resolution',d:'Initial organizational consent',b:'Governance'});
-  docs.push({n:'83(b) Election Letter',d:'IRS filing — submit within 30 days',b:'Tax'});
+  if(extras.some(function(e){return /employ/i.test(e);}))     docs.push({n:'Employment Agreement',d:'Includes IP assignment & non-compete clauses',b:'HR'});
+  if(isVC||extras.some(function(e){return /invest/i.test(e);})) {
+    docs.push({n:'Shareholders\' Agreement',d:'Founder rights, transfer restrictions, drag-along',b:'Equity'});
+  }
+  docs.push({n:'CRA Business Number Registration',d:'Required for HST, payroll, corporate tax',b:'CRA'});
 
   var sumH = '<div class="summ"><div class="sh"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><polyline points="4,6 5.5,7.5 8.5,4.5"/></svg>Your profile</div>'
     + row('Goal', obAns.goal||'—') + row('Team', obAns.size||'—') + row('Revenue', obAns.rev||'—')
-    + row('State', obAns.state||'—') + '<div class="sr"><span class="sk">Entity</span><span class="sv">' + rec + ' <span class="stag">Best fit</span></span></div></div>';
+    + row('Jurisdiction', obAns.state||'—') + '<div class="sr"><span class="sk">Entity</span><span class="sv">' + rec + ' <span class="stag">Best fit</span></span></div></div>';
 
   var dcH = '<div class="dcards">' + docs.map(function(d){
     return buildDocCard(d.n, d.d, d.b);
@@ -553,8 +587,8 @@ function showRecs() {
 
   addAI('<p><strong>Recommended: ' + rec + '</strong><br>' + note + '</p><p>Here are the documents you\'ll need:</p>', sumH + dcH);
   setTimeout(function(){
-    addAI('<p>Click any document above to access it in the store — all attorney-reviewed and signed. What questions do you have?</p>',
-      suggs(['What do I do first after incorporating?','Explain the 83(b) election','How do I set up founder equity?','What\'s the difference between these entity types?']));
+    addAI('<p>Click any document above to access it in the store — all reviewed by our in-house Canadian-licensed lawyer. What questions do you have?</p>',
+      suggs(['What do I do first after incorporating?','Federal vs provincial — which is right for me?','Explain the Lifetime Capital Gains Exemption','How does Canadian founder vesting work?']));
   }, 1500);
 }
 
@@ -562,28 +596,43 @@ function row(k, v) { return '<div class="sr"><span class="sk">'+k+'</span><span 
 
 // ── FREE RESPONSES ──────────────────────────
 var QAB = {
-  '83b':   '<p>An <strong>83(b) election</strong> lets founders pay taxes on equity <em>now</em> at its current (low) value, rather than at each vesting event when it may be worth much more. You have <strong>30 days from the grant date</strong> to file — missing this window is one of the most expensive mistakes early founders make.</p>',
-  'llc':   '<p><strong>LLC:</strong> Flexible ownership, pass-through taxes, fewer formalities. Great for solo founders or small teams not raising VC.<br><br><strong>C-Corp:</strong> Taxed separately, but preferred by investors due to flexible equity structures (preferred stock, SAFEs, convertible notes). Delaware is the standard for VC-backed startups.</p>',
-  'vest':  '<p><strong>Founder vesting</strong> means co-founders earn equity over time. Standard: <strong>4-year vest, 1-year cliff</strong>. No equity vests months 1–11. At month 12, 25% vests all at once. Then monthly for 3 more years. This protects the company if a founder leaves early.</p>',
-  'board': '<p>C-Corps are legally required to have a board of directors — at formation it\'s usually just the founders. After seed funding, investors typically take a board seat. A <strong>Board Consent Resolution</strong> is the first document your board signs — it\'s part of your initial formation paperwork.</p>',
-  'def':   '<p>Great question. The right answer depends on your specific situation — entity type, state, team size, and whether you\'re raising capital. Let me know more context and I\'ll give a more specific answer, or use the guided flow to get a full recommendation.</p>',
+  'lcge':       '<p>The <strong>Lifetime Capital Gains Exemption (LCGE)</strong> lets eligible Canadian founders shelter up to <strong>$1.25M (2024)</strong> of capital gains from tax when selling shares of a Qualified Small Business Corporation (QSBC). Three main tests: the corporation must be a CCPC, 90%+ of assets used in active business at sale, and 50%+ for the 24 months before sale. Plan early — losing CCPC status (e.g., taking US investment that triggers control issues) can disqualify you.</p>',
+  'section85':  '<p>A <strong>Section 85 rollover</strong> lets you transfer assets (like pre-company IP, contracts, or a sole prop business) into your corporation on a tax-deferred basis. You file a joint election with the corporation (Form T2057) and elect a transfer price that defers any capital gain. Critical for founders who started building before incorporating — without this, transferring IP to your corp can trigger immediate tax.</p>',
+  'fed_prov':   '<p><strong>Federal incorporation (CBCA):</strong> Nationwide name protection, easier to operate across provinces, slightly higher fees ($200 + extra-provincial registrations). Preferred by most VCs and growing companies.<br><br><strong>Provincial (e.g., OBCA, BCBCA):</strong> Cheaper to start (~$300-360), faster filing, but your name only has protection in that province. Good for businesses operating in one province with no national plans.</p>',
+  'sole_corp':  '<p><strong>Sole Proprietorship:</strong> Simplest structure — you and the business are legally the same. Income taxed as personal income. No liability protection — you\'re personally on the hook for debts and lawsuits.<br><br><strong>Corporation:</strong> Separate legal entity. Limited liability. Lower tax rates on retained earnings (~12-15% on first $500K via the small business deduction). Required for most investor-backed startups. More setup cost and ongoing compliance.</p>',
+  'vest':       '<p><strong>Founder share vesting</strong> means co-founders earn their shares over time. Standard: <strong>4-year vest, 1-year cliff</strong>. No shares vest months 1–11. At month 12, 25% vest at once. Then monthly for 3 more years. Critical for protecting the company if a founder leaves early. Implemented through a Restricted Share Agreement signed at incorporation.</p>',
+  'ccpc':       '<p>A <strong>CCPC (Canadian-Controlled Private Corporation)</strong> is a private Canadian corporation not controlled by non-residents or public companies. CCPC status unlocks: small business deduction (lower tax rate), SR&ED refundable tax credits, and Lifetime Capital Gains Exemption eligibility. Taking US VC investment can put CCPC status at risk if it gives non-residents control — speak with a tax lawyer before closing.</p>',
+  'sred':       '<p><strong>SR&ED (Scientific Research & Experimental Development)</strong> is Canada\'s biggest startup tax credit. CCPCs can get <strong>refundable</strong> credits of up to 35% on the first $3M of qualifying R&D spend (cash back, even if you have no tax owing). The work must involve genuine technological uncertainty and systematic investigation — not just routine engineering.</p>',
+  'board':      '<p>Canadian corporations are required to have at least one director (CBCA: at least 25% must be Canadian residents; some provinces have eliminated this requirement — Ontario removed it in 2023). At formation it\'s usually just the founders. After raising a Series A, investors typically take a board seat. <strong>Initial Directors\' Resolutions</strong> are signed at incorporation to appoint officers and authorize share issuance.</p>',
+  'def':        '<p>Great question. The right answer depends on your specific situation — entity type, province, team size, and whether you\'re raising capital. Tell me more about your context and I\'ll give a specific answer, or run the guided onboarding flow for a full recommendation.</p>',
 };
 
 function qaResp(t) {
   var q = t.toLowerCase();
-  var ans = /83.?b/i.test(q) ? QAB['83b'] : /llc|c.?corp|s.?corp/i.test(q) ? QAB['llc'] : /vest/i.test(q) ? QAB['vest'] : /board/i.test(q) ? QAB['board'] : QAB['def'];
+  var ans;
+  if (/lcge|lifetime capital|capital gains exemption/i.test(q)) ans = QAB['lcge'];
+  else if (/section.?85|rollover|transfer.{1,30}(asset|ip)/i.test(q)) ans = QAB['section85'];
+  else if (/federal.*provincial|provincial.*federal|cbca.*obca|federal vs/i.test(q)) ans = QAB['fed_prov'];
+  else if (/sole prop|proprietor|sole.?corp|incorporate.*vs|vs.{1,10}corp/i.test(q)) ans = QAB['sole_corp'];
+  else if (/vest|founder.{1,15}share/i.test(q)) ans = QAB['vest'];
+  else if (/ccpc|canadian.controlled/i.test(q)) ans = QAB['ccpc'];
+  else if (/sr.?\&?ed|sr.?and.?ed|r.?and.?d.?credit|tax credit/i.test(q)) ans = QAB['sred'];
+  else if (/board|director/i.test(q)) ans = QAB['board'];
+  else ans = QAB['def'];
   return { t:ans, s:['Tell me more','What document do I need for this?','Ask another question','Start the full incorporation flow'] };
 }
 
 function docsResp(t) {
   var q = t.toLowerCase();
   var n,d,b,e;
-  if(/nda|non.?disc|confid/i.test(q)){n='Mutual NDA';d='Standard bilateral non-disclosure';b='Privacy';e='An NDA prevents either party from sharing confidential information. A mutual NDA protects both sides — essential when sharing sensitive info with partners, vendors, or early hires.';}
-  else if(/vest|equity|co.?found/i.test(q)){n='Founder Vesting Agreement';d='4-year vest, 1-year cliff';b='Equity';e='A founder vesting agreement ensures co-founders earn equity over time. Standard: 4 years with a 1-year cliff — protecting the company if a founder leaves early.';}
-  else if(/ip|intellectual|patent|assign/i.test(q)){n='IP Assignment Agreement';d='Transfer pre-company IP to entity';b='IP';e='An IP Assignment transfers anything you created before incorporation — code, designs, inventions — to the company. Most investors require this before funding.';}
-  else if(/employ|contractor|hire/i.test(q)){n='Employment Agreement';d='Contractor and full-time employee terms';b='HR';e='Employment agreements define compensation, IP ownership, confidentiality, and termination. Misclassifying workers creates serious tax and legal liability.';}
-  else if(/bylaw|govern/i.test(q)){n='Corporate Bylaws';d='Board structure, voting, officer roles';b='C-Corp';e='Bylaws are the internal rules of a corporation — how the board operates, how decisions are made, and officer responsibilities. Required for all C-Corps.';}
-  else{n='LLC Operating Agreement';d='Single-member & multi-member versions';b='LLC';e='An Operating Agreement governs how your LLC runs — ownership, decision-making, profit distribution, and exit procedures. Even single-member LLCs benefit from one.';}
+  if(/nda|non.?disc|confid/i.test(q)){n='Mutual NDA';d='Standard bilateral non-disclosure agreement';b='Privacy';e='An NDA prevents either party from sharing confidential information. A mutual NDA protects both sides — essential when sharing sensitive info with partners, vendors, or early hires.';}
+  else if(/vest|equity|co.?found/i.test(q)){n='Founder Share Vesting Agreement';d='4-year vest, 1-year cliff';b='Equity';e='A founder share vesting agreement ensures co-founders earn their shares over time. Standard: 4 years with a 1-year cliff — protecting the company if a founder leaves early. Implemented in Canada through a Restricted Share Agreement.';}
+  else if(/ip|intellectual|patent|assign/i.test(q)){n='IP Assignment Agreement';d='Transfer pre-company IP to corporation';b='IP';e='An IP Assignment transfers code, designs, inventions, and other IP you created before incorporating into the company. Pair this with a Section 85 rollover election to avoid triggering immediate tax on the transfer. Most investors require this before funding.';}
+  else if(/employ|contractor|hire/i.test(q)){n='Employment Agreement';d='Includes IP, confidentiality, non-compete clauses';b='HR';e='Employment agreements define compensation, IP ownership, confidentiality, and termination. Misclassifying workers as contractors when they\'re really employees creates serious CRA and provincial labour board liability.';}
+  else if(/bylaw|govern/i.test(q)){n='Corporate By-laws';d='Board structure, voting, officer roles';b='Required';e='By-laws are the internal rules of a corporation — how the board operates, how decisions are made, and what officers are responsible for. Every Canadian corporation needs them at incorporation.';}
+  else if(/sole prop|register.*business/i.test(q)){n='Sole Proprietorship Registration';d='Provincial business name registration';b='Formation';e='If you\'re operating under any name other than your legal personal name, you must register your business name with the province. Required before opening a business bank account or applying for a business number.';}
+  else if(/sharehold|cap.?table|share.?agreement/i.test(q)){n='Shareholders\' Agreement';d='Founder rights, transfer restrictions, drag-along';b='Equity';e='A shareholders\' agreement governs how owners deal with each other — share transfer rights, drag-along clauses for sale events, decision-making thresholds. Critical when you have 2+ founders or any outside investment.';}
+  else{n='Articles of Incorporation';d='Federal (CBCA) and provincial templates';b='Formation';e='Articles of Incorporation are the foundational document creating your corporation. They specify the share classes, restrictions on share transfers, and minimum/maximum number of directors. Filed with Corporations Canada (federal) or your provincial registrar.';}
   var card = '<div class="dcards">' + buildDocCard(n, d, b) + '</div>';
   return { t:'<p>'+e+'</p><p>Here\'s the right document for you:</p>', x:card, s:['Do I need anything else?','What does this cover exactly?','Find another document','Start the full incorporation flow'] };
 }
@@ -591,11 +640,11 @@ function docsResp(t) {
 function strResp(t) {
   var q = t.toLowerCase();
   var rec,note;
-  if(/raise|invest|vc|seed|series/i.test(q)){rec='C-Corporation (Delaware)';note='If you\'re raising venture capital, a Delaware C-Corp is essentially required. Most institutional investors won\'t fund an LLC.';}
-  else if(/solo|just me|alone|one person/i.test(q)){rec='Single-Member LLC';note='For a solo founder not raising VC, a single-member LLC is ideal — liability protection, pass-through taxes, minimal overhead.';}
-  else if(/co.?found|partner|two|three/i.test(q)){rec='Multi-Member LLC or C-Corp';note='With co-founders you need a formal equity agreement regardless of entity. Bootstrapping: multi-member LLC. Raising VC: C-Corp with founder vesting from day one.';}
-  else if(/llc.*invest|convert/i.test(q)){rec='Convert LLC to C-Corp';note='LLCs can convert to C-Corps, but it\'s cleaner and cheaper to do it early — before investors, complex cap tables, or tax complications.';}
-  else{rec='Let\'s figure that out together';note='To give a specific recommendation I need more context. Are you solo or with co-founders? Planning to raise capital? Which state?';}
+  if(/raise|invest|vc|seed|series/i.test(q)){rec='Federal Corporation (CBCA)';note='If you\'re raising Canadian VC, a federal corporation under the CBCA is the standard. It gives nationwide name protection and is what most institutional investors expect. Make sure to maintain CCPC status — it unlocks SR&ED tax credits and the Lifetime Capital Gains Exemption.';}
+  else if(/solo|just me|alone|one person/i.test(q)){rec='Sole Proprietorship (for now)';note='Solo founders just starting out can usually skip incorporation initially. A sole prop is cheap and simple. But once you have meaningful revenue ($30K+ for HST registration), real liability exposure, or any outside investment, incorporating becomes worth the cost.';}
+  else if(/co.?found|partner|two|three/i.test(q)){rec='Provincial or Federal Corporation';note='With co-founders, incorporation is essentially required — you need formal share allocations, vesting, and a shareholders\' agreement. Federal (CBCA) if you plan to raise capital or operate nationally; provincial if staying local.';}
+  else if(/sole.*incorporate|convert/i.test(q)){rec='Convert to a Corporation via Section 85 Rollover';note='You can transfer a sole proprietorship into a corporation tax-deferred using a Section 85 rollover. Best to do this before significant goodwill or asset value has built up. File Form T2057 with CRA jointly with your new corporation.';}
+  else{rec='Let\'s figure that out together';note='To give a specific recommendation I need more context. Are you solo or with co-founders? Planning to raise capital? Which province? What\'s the business about?';}
   return { t:'<p><strong>My recommendation: '+rec+'</strong></p><p>'+note+'</p>', s:['What documents do I need?','Start the full guided flow','What are the tax implications?','Tell me more'] };
 }
 
@@ -608,10 +657,10 @@ function routeResponse(text) {
   if (flow === 'structure') return strResp(text);
 
   // For free-form / qa / post-onboarding, detect intent from message
-  if (/\b(nda|non.?disclosure|confidential|vesting agreement|operating agreement|bylaws|ip assignment|employment agreement|need.{1,20}(document|template|agreement|contract))\b/i.test(q)) {
+  if (/\b(nda|non.?disclosure|confidential|vesting agreement|by.?laws|ip assignment|employment agreement|shareholders.{1,5}agreement|articles of incorporation|need.{1,20}(document|template|agreement|contract))\b/i.test(q)) {
     return docsResp(text);
   }
-  if (/\b(should i|what entity|llc or|c.?corp or|s.?corp or|set up|structure|co.?founder|raise|invest|incorporate.{1,20}as)\b/i.test(q) && !/explain|what is|how does|when do/i.test(q)) {
+  if (/\b(should i|what entity|federal or provincial|incorporate.{1,20}as|sole prop|set up|structure|co.?founder|raise|invest)\b/i.test(q) && !/explain|what is|how does|when do/i.test(q)) {
     return strResp(text);
   }
   // Default to QA for explanations and general questions
