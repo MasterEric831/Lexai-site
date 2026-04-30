@@ -454,7 +454,8 @@
 
   /* ─── PRICING ─── */
   #pricing { background: var(--cream); }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 3rem; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 3rem; }
+  @media (max-width: 1080px) { .pricing-grid { grid-template-columns: repeat(2, 1fr); max-width: 720px; margin-left: auto; margin-right: auto; } }
   .plan {
     border: 1px solid var(--ink-08); border-radius: var(--r-lg);
     padding: 1.75rem; background: #fff; display: flex; flex-direction: column;
@@ -875,23 +876,15 @@
         <div class="docs-list fade-in">
           <div class="doc-item">
             <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
-            <div class="doc-item-info"><div class="doc-item-name">Articles of Incorporation</div><div class="doc-item-desc">Delaware C-Corp, all standard provisions</div></div>
+            <div class="doc-item-info"><div class="doc-item-name">Articles of Incorporation</div><div class="doc-item-desc">CBCA federal & all provincial templates</div></div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-              <span class="doc-item-badge">C-Corp</span>
+              <span class="doc-item-badge">CBCA</span>
               <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
             </div>
           </div>
           <div class="doc-item">
             <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
-            <div class="doc-item-info"><div class="doc-item-name">LLC Operating Agreement</div><div class="doc-item-desc">Single-member & multi-member versions</div></div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-              <span class="doc-item-badge">LLC</span>
-              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
-            </div>
-          </div>
-          <div class="doc-item">
-            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
-            <div class="doc-item-info"><div class="doc-item-name">Founder Vesting Agreement</div><div class="doc-item-desc">4-year schedule, 1-year cliff</div></div>
+            <div class="doc-item-info"><div class="doc-item-name">Shareholders' Agreement</div><div class="doc-item-desc">Founder rights, transfer restrictions, drag-along</div></div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
               <span class="doc-item-badge">Equity</span>
               <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
@@ -899,7 +892,15 @@
           </div>
           <div class="doc-item">
             <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
-            <div class="doc-item-info"><div class="doc-item-name">IP Assignment Agreement</div><div class="doc-item-desc">Transfer pre-incorporation IP to entity</div></div>
+            <div class="doc-item-info"><div class="doc-item-name">Founder Share Vesting Agreement</div><div class="doc-item-desc">4-year schedule, 1-year cliff (Restricted Share form)</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">Equity</span>
+              <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
+            </div>
+          </div>
+          <div class="doc-item">
+            <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
+            <div class="doc-item-info"><div class="doc-item-name">IP Assignment Agreement</div><div class="doc-item-desc">Section 85 rollover-eligible asset transfer</div></div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
               <span class="doc-item-badge">IP</span>
               <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
@@ -907,9 +908,9 @@
           </div>
           <div class="doc-item">
             <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
-            <div class="doc-item-info"><div class="doc-item-name">Corporate Bylaws</div><div class="doc-item-desc">Board structure, voting rights, officer roles</div></div>
+            <div class="doc-item-info"><div class="doc-item-name">Corporate By-laws</div><div class="doc-item-desc">Board structure, voting rights, officer roles</div></div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-              <span class="doc-item-badge">C-Corp</span>
+              <span class="doc-item-badge">Required</span>
               <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
             </div>
           </div>
@@ -923,16 +924,17 @@
           </div>
           <div class="doc-item">
             <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
-            <div class="doc-item-info"><div class="doc-item-name">Board Consent Resolution</div><div class="doc-item-desc">Initial organizational consent in lieu of meeting</div></div>
+            <div class="doc-item-info"><div class="doc-item-name">Initial Directors' Resolutions</div><div class="doc-item-desc">First board actions: officers, share issuance, banking</div></div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-              <span class="doc-item-badge">C-Corp</span>
+              <span class="doc-item-badge">Governance</span>
               <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
             </div>
           </div>
           <div class="doc-item">
             <div class="doc-file-icon"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v10H2z"/><path d="M9 1v3h3"/><line x1="4" y1="7" x2="10" y2="7"/><line x1="4" y1="10" x2="10" y2="10"/></svg></div>
-            <div class="doc-item-info"><div class="doc-item-name">83(b) Election Letter</div><div class="doc-item-desc">IRS filing for unvested founder shares</div></div>
+            <div class="doc-item-info"><div class="doc-item-name">Section 85 Rollover Election</div><div class="doc-item-desc">CRA Form T2057 — tax-deferred asset transfer</div></div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span class="doc-item-badge">Tax</span>
               <span class="doc-item-badge">Tax</span>
               <span class="atty-badge"><svg viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5"/></svg> Attorney signed</span>
             </div>
@@ -966,29 +968,34 @@
     <div class="eyebrow"><span class="eyebrow-line"></span> Pricing</div>
     <h2 class="section-title">Straightforward pricing.<br><em>No surprise attorney fees.</em></h2>
     <div class="pricing-grid">
+
+      <!-- TIER 1: STARTER (FREE) -->
       <div class="plan fade-in">
         <div class="plan-tier">Starter</div>
         <div class="plan-price">$0</div>
         <div class="plan-period">Free forever</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> LexAI chat (50 messages/mo)</li>
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> 5 document downloads</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> 20 LexAI questions/month</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Risk profile &amp; structure guidance</li>
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Incorporation basics guide</li>
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> State filing lookup</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Provincial filing lookup</li>
+          <li style="opacity:0.4;"><svg class="plan-check" viewBox="0 0 14 14" style="opacity:0.5;"><line x1="3" y1="3" x2="11" y2="11"/><line x1="11" y1="3" x2="3" y2="11"/></svg> No document templates</li>
         </ul>
         <button class="plan-cta" onclick="window.location.href='lexai-chat.html'">Get started free</button>
       </div>
+
+      <!-- TIER 2: FOUNDER (FEATURED) -->
       <div class="plan featured fade-in" style="transition-delay:0.1s">
         <div class="plan-tier">Founder</div>
-        <div class="plan-price">$49</div>
+        <div class="plan-price">$29</div>
         <div class="plan-period">per month, billed monthly</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Unlimited LexAI conversations</li>
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Full document store access</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Full legal document templates</li>
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Document customization tools</li>
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> State filing checklists</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Provincial filing checklists</li>
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Compliance reminders</li>
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Priority email support</li>
           <li style="margin-top:4px;padding-top:10px;border-top:1px solid rgba(248,245,239,0.12);">
@@ -996,22 +1003,43 @@
             <span><strong style="color:var(--cream)">In-house attorney review</strong> &amp; sign-off on all documents</span>
           </li>
         </ul>
-        <button class="plan-cta" onclick="handleFounderUpgrade()">Upgrade to Founder — $49/mo</button>
+        <button class="plan-cta" onclick="handleUpgrade('founder')">Upgrade to Founder — $29/mo</button>
       </div>
+
+      <!-- TIER 3: LAW FIRM -->
       <div class="plan fade-in" style="transition-delay:0.2s">
         <div class="plan-tier">Law Firm</div>
-        <div class="plan-price">Custom</div>
-        <div class="plan-period">White-label available</div>
+        <div class="plan-price">$299</div>
+        <div class="plan-period">per month, billed monthly</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Custom branded AI assistant</li>
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Your own document store</li>
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Client-facing portal</li>
-          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> API access & integrations</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Everything in Founder</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> 10 custom in-house docs/month</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Bespoke attorney drafting</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Dedicated client portal</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Phone &amp; chat support</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Multi-province filings included</li>
+        </ul>
+        <button class="plan-cta" onclick="handleUpgrade('law_firm')">Upgrade to Law Firm — $299/mo</button>
+      </div>
+
+      <!-- TIER 4: SCALE / PAY-AS-YOU-GO -->
+      <div class="plan fade-in" style="transition-delay:0.3s">
+        <div class="plan-tier">Scale</div>
+        <div class="plan-price">Custom</div>
+        <div class="plan-period">Pay-as-you-go pricing</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Everything in Law Firm</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Unlimited custom documents</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Per-document pricing</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> White-label options</li>
+          <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> API access &amp; integrations</li>
           <li><svg class="plan-check" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3"/></svg> Dedicated account manager</li>
         </ul>
-        <button class="plan-cta" onclick="window.location.href='mailto:eric.jakubov@gmail.com?subject=LexAI Law Firm Inquiry'">Talk to us</button>
+        <button class="plan-cta" onclick="window.location.href='mailto:eric.jakubov@gmail.com?subject=LexAI Scale Plan Inquiry&amp;body=Hi%20LexAI%20team%2C%0A%0AI%27m%20interested%20in%20learning%20more%20about%20the%20Scale%20plan.%0A%0ABest%2C'">Talk to us</button>
       </div>
+
     </div>
   </div>
 </section>
@@ -1027,11 +1055,11 @@
         <div class="testi-author"><div class="avatar av1">SR</div><div><div class="author-name">Sofia R.</div><div class="author-role">Co-founder, Vesper Labs</div></div></div>
       </div>
       <div class="testi-card fade-in" style="transition-delay:0.1s">
-        <div class="testi-quote">"The document store alone saved us $4,000 in attorney fees. And LexAI walked us through our 83(b) election before we even knew we needed one."</div>
+        <div class="testi-quote">"The document store alone saved us $4,000 in lawyer fees. And LexAI walked us through Section 85 rollovers and SR&amp;ED eligibility before we even knew we should be asking about them."</div>
         <div class="testi-author"><div class="avatar av2">JL</div><div><div class="author-name">James L.</div><div class="author-role">Founder & CEO, Frond</div></div></div>
       </div>
       <div class="testi-card fade-in" style="transition-delay:0.15s">
-        <div class="testi-quote">"As a non-technical founder, legal stuff terrified me. LexAI made it feel manageable. I incorporated my Delaware C-Corp in a weekend."</div>
+        <div class="testi-quote">"As a non-technical founder, legal stuff terrified me. LexAI made it feel manageable. I incorporated my CBCA federal corporation in a weekend."</div>
         <div class="testi-author"><div class="avatar av3">MK</div><div><div class="author-name">Maya K.</div><div class="author-role">Founder, Orbit Studio</div></div></div>
       </div>
       <div class="testi-card fade-in" style="transition-delay:0.2s">
@@ -1062,15 +1090,15 @@
       </div>
       <div class="faq-item">
         <button class="faq-q">What entity types does LexAI cover? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
-        <div class="faq-a">LexAI covers C-Corporations, S-Corporations, LLCs (single-member and multi-member), and general partnerships. The AI assistant can help you understand the trade-offs between entity types and guide you toward the right fit for your situation.</div>
+        <div class="faq-a">LexAI covers federal corporations (CBCA), provincial corporations across all provinces, sole proprietorships, partnerships (general and limited), and cooperatives. The AI assistant can help you understand the trade-offs between entity types and guide you toward the right fit for your situation.</div>
       </div>
       <div class="faq-item">
         <button class="faq-q">Can I use LexAI for my law firm or legal practice? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
         <div class="faq-a">Yes. The Law Firm plan offers a white-label version of LexAI that you can deploy under your own brand, populated with your own document store and your own attorney oversight workflow. Contact us to learn more.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">Does LexAI cover all 50 states? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
-        <div class="faq-a">Yes. LexAI has state-specific formation guides, filing fee information, and compliance checklists for all 50 states. Document templates note the jurisdiction(s) they apply to, and our in-house attorney reviews jurisdiction-specific nuances during sign-off.</div>
+        <button class="faq-q">Does LexAI cover all provinces and territories? <span class="faq-chevron"><svg viewBox="0 0 16 16"><polyline points="4,6 8,10 12,6"/></svg></span></button>
+        <div class="faq-a">Yes. LexAI has province-specific incorporation guides, filing fee information, and compliance checklists for all 13 provinces and territories — including federal incorporation under the CBCA. Document templates note the jurisdiction(s) they apply to, and our in-house attorney reviews jurisdiction-specific nuances during sign-off.</div>
       </div>
     </div>
     <div class="faq-disclaimer">
@@ -1482,7 +1510,7 @@
         }
       });
 
-      // Check subscription status — if already Founder, pricing CTA should just open chat
+      // Check subscription status — adjust pricing CTA buttons based on current plan
       try {
         const subRes = await sbClient
           .from('subscriptions')
@@ -1490,16 +1518,42 @@
           .eq('user_id', session.user.id)
           .single();
 
-        if (subRes.data && (subRes.data.plan === 'founder' || subRes.data.plan === 'law_firm')
-            && (subRes.data.status === 'active' || subRes.data.status === 'trialing')) {
-          document.querySelectorAll('button').forEach(btn => {
-            const t = btn.textContent.trim();
-            if (/upgrade to founder/i.test(t) || /start.*trial/i.test(t)) {
-              btn.textContent = 'Open chat';
-              btn.onclick = () => window.location.href = 'lexai-chat.html';
+        const plan = subRes.data?.plan;
+        const isActive = subRes.data && (subRes.data.status === 'active' || subRes.data.status === 'trialing');
+
+        if (!isActive) return;
+
+        document.querySelectorAll('.plan-cta').forEach(btn => {
+          const t = btn.textContent.trim();
+          // If user is on Founder, hide "Upgrade to Founder" → "Current plan"
+          if (plan === 'founder') {
+            if (/upgrade to founder/i.test(t)) {
+              btn.textContent = 'Current plan';
+              btn.disabled = true;
+              btn.style.opacity = '0.5';
+              btn.style.cursor = 'default';
+              btn.onclick = null;
             }
-          });
-        }
+            // Law firm button stays as upgrade
+          }
+          // If user is on Law Firm, both Founder and Law Firm say "Current plan" or up
+          if (plan === 'law_firm') {
+            if (/upgrade to founder/i.test(t)) {
+              btn.textContent = 'Included';
+              btn.disabled = true;
+              btn.style.opacity = '0.5';
+              btn.style.cursor = 'default';
+              btn.onclick = null;
+            }
+            if (/upgrade to law firm/i.test(t)) {
+              btn.textContent = 'Current plan';
+              btn.disabled = true;
+              btn.style.opacity = '0.5';
+              btn.style.cursor = 'default';
+              btn.onclick = null;
+            }
+          }
+        });
       } catch (subErr) { /* noop - no subscription row yet */ }
     } catch (e) { /* noop */ }
   }
@@ -1509,8 +1563,12 @@
     if (e.key === 'Escape' && typeof closeAuth === 'function') closeAuth();
   });
 
-  // ── CHECKOUT (FOUNDER UPGRADE) ────────────────
-  window.handleFounderUpgrade = async function() {
+  // ── CHECKOUT (PLAN UPGRADE) ────────────────
+  // Generic upgrade handler — accepts 'founder' or 'law_firm' as plan name.
+  window.handleUpgrade = async function(plan) {
+    plan = plan || 'founder';
+    var planLabel = plan === 'law_firm' ? 'Law Firm' : 'Founder';
+
     // If Supabase isn't ready yet, just open the auth modal
     if (!sbClient) {
       openAuth('signup');
@@ -1530,19 +1588,22 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + session.access_token,
         },
-        body: JSON.stringify({ plan: 'founder' }),
+        body: JSON.stringify({ plan: plan }),
       });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert('Could not start checkout: ' + (data.error || 'unknown error'));
+        alert('Could not start ' + planLabel + ' checkout: ' + (data.error || 'unknown error'));
       }
     } catch (e) {
       console.error('Upgrade error:', e);
       alert('Could not start checkout. Please try again.');
     }
   };
+
+  // Backward-compat alias (in case any old buttons still call this)
+  window.handleFounderUpgrade = function() { return window.handleUpgrade('founder'); };
 
   // Initialize Supabase with retry polling
   // The CDN script may load AFTER this script block executes, so we poll.

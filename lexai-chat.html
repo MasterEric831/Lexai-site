@@ -345,7 +345,7 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(-
       <li><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,7 6,10 11,4"/></svg>Priority attorney review on custom documents</li>
       <li><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,7 6,10 11,4"/></svg>Cancel anytime</li>
     </ul>
-    <p class="pw-price"><strong>$49</strong> / month</p>
+    <p class="pw-price"><strong>$29</strong> / month</p>
     <button class="pw-btn" id="pwUpgradeBtn" onclick="startCheckout('founder')">Upgrade to Founder</button>
     <button class="pw-btn-secondary" onclick="closePaywall()">Maybe later</button>
   </div>
@@ -1390,7 +1390,7 @@ function openPaywall(context) {
     title.innerHTML = 'Upgrade to <em>Founder</em>';
     sub.textContent = 'Unlimited AI conversations, full access to every attorney-reviewed document, and priority support.';
   }
-  document.getElementById('pwUpgradeBtn').textContent = 'Upgrade to Founder — $49/mo';
+  document.getElementById('pwUpgradeBtn').textContent = 'Upgrade to Founder — $29/mo';
   document.getElementById('pwUpgradeBtn').onclick = function() { startCheckout('founder'); };
   document.getElementById('pwOverlay').classList.add('open');
 }
@@ -1424,12 +1424,12 @@ async function startCheckout(plan) {
     } else {
       alert('Could not start checkout: ' + (data.error || 'unknown error'));
       btn.disabled = false;
-      btn.textContent = 'Upgrade to Founder — $49/mo';
+      btn.textContent = 'Upgrade to Founder — $29/mo';
     }
   } catch (e) {
     alert('Could not start checkout. Please try again.');
     btn.disabled = false;
-    btn.textContent = 'Upgrade to Founder — $49/mo';
+    btn.textContent = 'Upgrade to Founder — $29/mo';
   }
 }
 
