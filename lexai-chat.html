@@ -220,6 +220,7 @@ header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(-
       <div class="sb-item active" onclick="newChat()"><svg viewBox="0 0 14 14"><path d="M2 12Q2 13 3 13H11Q12 13 12 12V5Q12 4 11 4H8L6 2H3Q2 2 2 3Z"/></svg>Chat with LexAI</div>
       <a class="sb-item" href="https://www.businessdocs.ca" target="_blank"><svg viewBox="0 0 14 14"><path d="M2 1h8l2 2v9H2z"/><path d="M9 1v3h3"/></svg>Document store</a>
       <div class="sb-item" onclick="startFlow('onboard')"><svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><polyline points="4,7 6,9 10,5"/></svg>Incorporation checklist</div>
+      <a class="sb-item" href="/taxation.html" style="text-decoration:none;"><svg viewBox="0 0 14 14"><path d="M3 1h6l3 3v9H3z"/><path d="M9 1v3h3"/><line x1="5" y1="6" x2="10" y2="6"/><line x1="5" y1="9" x2="10" y2="9"/><circle cx="9" cy="11" r="0.5" fill="currentColor"/></svg>Taxation</a>
       <div class="sb-item" onclick="alert('My Filings is coming soon — track your incorporation status and document submissions here.')"><svg viewBox="0 0 14 14"><rect x="1" y="3" width="12" height="9" rx="1.5"/><path d="M9 3V2a2 2 0 00-4 0v1"/></svg>My filings</div>
     </div>
     <div class="sb-div"></div>
@@ -356,8 +357,8 @@ var OB = [
     {e:'👤',l:'Just me (solo founder)'},{e:'👥',l:'2–3 co-founders'},
     {e:'🏃',l:'4–10 employees'},{e:'🏗️',l:'11–50 employees'},{e:'🏢',l:'50+ employees'}]},
   { id:'rev', q:"Expected <strong>revenue or funding</strong> in year one?", type:'s', choices:[
-    {e:'🌱',l:'Pre-revenue / just starting'},{e:'💵',l:'Under $250K annually'},
-    {e:'📈',l:'$250K – $1M annually'},{e:'🚀',l:'Seeking seed or Series A funding'},{e:'🏦',l:'Already funded or $1M+'}]},
+    {e:'🌱',l:'Pre-revenue / just starting'},{e:'💵',l:'Under $100K annually'},
+    {e:'📈',l:'$100K – $1M annually'},{e:'🚀',l:'Seeking seed or Series A funding'},{e:'🏦',l:'Already funded or $1M+'}]},
   { id:'state', q:"Which <strong>state</strong> are you incorporating in?", type:'s', choices:[
     {e:'🏛️',l:'Delaware (recommended for VC)'},{e:'⚡',l:'Nevada or Wyoming (privacy)'},
     {e:'🌟',l:'California'},{e:'🗽',l:'New York'},{e:'📍',l:'My home state (other)'}]},
